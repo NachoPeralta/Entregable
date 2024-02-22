@@ -1,0 +1,46 @@
+<h1>{{title}}</h1>
+<div>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>En Stock</th>
+        <th>Precio</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      {{#each payload}}
+        <tr>
+          <td>{{this.code}}</td>
+          <td>{{this.title}}</td>
+          <td>{{this.description}}</td>
+          <td>{{this.stock}}</td>
+          <td>{{this.price}}</td>
+          <td>
+            Cantidad<input
+              id="qtInput"
+              type="number"
+              min="1"
+              max="{{this.stock}}"
+              value="1"
+              data-product-id="{{this._id}}"
+            />
+          </td>
+          <td>
+            <button class="btnAddToCart" data-product-id="{{this._id}}">Agregar al Carrito</button>          
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{#if hasPrevPage}}
+    <a href="/api/products?page={{prevPage}}&limit={{limit}}"> Anterior </a>
+  {{/if}}
+  {{#if hasNextPage}}
+    <a href="/api/products?page={{nextPage}}&limit={{limit}}"> Siguiente </a>
+  {{/if}}
+  <p>Pagina {{page}} de {{totalPages}} </p>
+</div>

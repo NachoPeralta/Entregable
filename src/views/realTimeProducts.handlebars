@@ -1,0 +1,30 @@
+
+<h1>Productos</h1>
+
+
+<table id="productsContainer">
+    <thead id="productsHeader"></thead>
+    <tbody id="productsBody"></tbody>
+</table>
+
+<h2>Agregar Nuevo Producto</h2>
+
+<form>
+    <input type="text" id="title" placeholder="Titulo">
+    <input type="text" id="description" placeholder="Descripción">
+    <input type="number" id="price" placeholder="Precio">
+    <input type="text" id="img" value="Sin Imagen">
+    <input type="text" id="code" placeholder="Código">
+    <input type="number" id="stock" placeholder="Stock">
+    <input type="text" id="category" placeholder="Categoria">
+     <select id="status">
+        <option value="true">Activo</option>
+        <option value="false">Inactivo</option>
+    </select>
+    <button type="button" id="btnSend">Enviar</button>
+</form>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<script src="../public/js/index.js"></script>
+
