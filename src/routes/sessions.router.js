@@ -9,19 +9,20 @@ router.post("/login", passport.authenticate("login", {failureRedirect: "/api/ses
         first_name: req.user.first_name,
         last_name: req.user.last_name,
         age: req.user.age,
-        email: req.user.email
+        email: req.user.email,
+        role: req.user.role
     };
 
     req.session.login = true;
 
-    res.redirect("/profile");
+    res.redirect("/api/products");
 })
 
 router.get("/logout", (req, res) => {
     if (req.session.login) {
         req.session.destroy();
     }
-    res.redirect("/login");
+    res.redirect("/");
 })
 
 

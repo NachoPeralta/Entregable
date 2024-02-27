@@ -5,7 +5,7 @@ const passport = require("passport");
 router.post("/", passport.authenticate("register", {
     failureRedirect: "/failedregister"
 }), async (req, res) => {
-    if(!req.user) return res.status(400).send({status: "error", message: "Credenciales invalidas"});
+    if (!req.user) return res.status(400).send({ status: "error", message: "Credenciales invalidas" });
 
     req.session.user = {
         first_name: req.user.first_name,
@@ -16,11 +16,11 @@ router.post("/", passport.authenticate("register", {
 
     req.session.login = true;
 
-    res.redirect("/profile");
+    res.redirect("/api/products");
 })
 
 router.get("/failedregister", (req, res) => {
-    res.send({error: "Registro fallido"});
+    res.send({ error: "Registro fallido, verifique credenciales" });
 })
 
 module.exports = router; 

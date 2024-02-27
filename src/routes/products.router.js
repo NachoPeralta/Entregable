@@ -20,7 +20,7 @@ router.get("/", async (req, res) => {
             res.status(404).send({ status: "error", error: "No se encontraron productos" });
             return;
         }
-        
+
         const result = products.docs.map(product => {
             const { _id, ...rest } = product;
             return rest;
@@ -40,7 +40,12 @@ router.get("/", async (req, res) => {
             limit: limit,
             page: page,
             query: query,
-            title: title
+            title: title,
+            first_name: req.user.first_name,
+            last_name: req.user.last_name,
+            age: req.user.age,
+            email: req.user.email,
+            role: req.user.role
         });
 
     } catch (error) {
@@ -52,6 +57,7 @@ router.get("/", async (req, res) => {
 
 // Devuelve el producto dado un ID
 router.get("/:pid", async (req, res) => {
+    console.log("*** products.router req.params.pid:" + req.params.pid)
     const product = await productManager.getProductById(req.params.pid);
 
     if (product) {

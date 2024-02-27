@@ -18,10 +18,10 @@ router.get("/chat", async (req, res) => {
 })
 
 // Ruta para el formulario de login
-router.get("/login", (req, res) => {
+router.get("/", (req, res) => {
     // Verifica si el usuario ya está logueado y redirige a la página de perfil si es así
     if (req.session.login) {
-        return res.redirect("/profile");
+        return res.redirect("/products");
     }
 
     res.render("login");
@@ -41,7 +41,7 @@ router.get("/profile", (req, res) => {
     // Verifica si el usuario está logueado
     if (!req.session.login) {
         // Redirige al formulario de login si no está logueado
-        return res.redirect("/login");
+        return res.redirect("/");
     }
 
     // Renderiza la vista de perfil con los datos del usuario
