@@ -8,13 +8,17 @@ const productManager = new ProductManager();
 // Devuelve todos los productos o la cantidad de productos que se le pase como limit
 router.get("/", async (req, res) => {
     try {
+
+        console.log("*** products.router req.query:" + req.query)
+        console.log("*** products.router req.query.category:" + req.query.category)
+
         let limit = parseInt(req.query.limit) || 10;
         let page = parseInt(req.query.page) || 1;
-        let query = req.query.query || "";
+        let category = req.query.category || "";
         let sort = req.query.sort || "asc";
         let title = "Listado de Productos"
 
-        const products = await productManager.getProducts(limit, page, query, sort);
+        const products = await productManager.getProducts(limit, page, category, sort);
 
         if (!products) {
             res.status(404).send({ status: "error", error: "No se encontraron productos" });
@@ -39,7 +43,7 @@ router.get("/", async (req, res) => {
             nextLink: products.hasNextPage ? `/products?page=${products.nextPage}` : null,
             limit: limit,
             page: page,
-            query: query,
+            category: category,
             title: title,
             first_name: req.user.first_name,
             last_name: req.user.last_name,

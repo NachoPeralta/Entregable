@@ -32,16 +32,16 @@ class ProductManager {
         return product;
     }
 
-    async getProducts(limit, page, query, sort) {
+    async getProducts(limit, page, category, sort) {
         try {
 
             let criteria = [];
-
+            
             // Filtro por categoría si se proporciona en query
-            if (query.category) {
+            if (category) {
                 criteria.push({
                     $match: {
-                        category: query.category,
+                        category: category,
                     }
                 });
             }
