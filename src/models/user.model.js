@@ -7,8 +7,8 @@ const userSchema = mongoose.Schema({
     },
 
     last_name : {
-        type: String, 
-        required: true
+        type: String 
+        //required: true
     },
 
     email : {
@@ -19,13 +19,13 @@ const userSchema = mongoose.Schema({
     }, 
 
     password: {
-        type: String, 
-        required: true
+        type: String 
+        //required: true
     },
 
     age : {
-        type: Number, 
-        required: true
+        type: Number 
+        //required: true
     },
     role : {
         type: String

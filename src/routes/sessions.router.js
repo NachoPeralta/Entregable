@@ -31,5 +31,22 @@ router.get("/faillogin", async (req, res ) => {
     res.send({error: "Error en Login"});
 })
 
+router.get("/github", passport.authenticate("github", {scope: ["user:email"]}), async (req, res) => {
+    res.send("Login con github");
+});
+
+router.get("/githubcallback", passport.authenticate("github", {failureRedirect: "/login"}), async (req, res) => {
+    req.session.user = {
+        first_name: req.user.first_name,
+        last_name: req.user.last_name,
+        age: req.user.age,
+        email: req.user.email,
+        role: req.user.role
+    };
+
+    req.session.login = true;
+
+    res.redirect("/api/products");
+});
 
 module.exports = router;
