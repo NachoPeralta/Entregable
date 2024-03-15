@@ -19,7 +19,7 @@ router.get("/chat", async (req, res) => {
 
 // Ruta para el formulario de login
 router.get("/", (req, res) => {
-    // Verifica si el usuario ya está logueado y redirige a la página de perfil si es así
+    // Verifica si el usuario ya está logueado y redirige a la página de productos
     if (req.session.login) {
         return res.redirect("/products");
     }
@@ -29,7 +29,7 @@ router.get("/", (req, res) => {
 
 // Ruta para el formulario de registro
 router.get("/register", (req, res) => {
-    // Verifica si el usuario ya está logueado y redirige a la página de perfil si es así
+    // Verifica si el usuario ya está logueado y redirige a la página de perfil
     if (req.session.login) {
         return res.redirect("/profile");
     }

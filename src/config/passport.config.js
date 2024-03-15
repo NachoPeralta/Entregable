@@ -84,8 +84,7 @@ const initializePassport = () => {
         callbackURL: "http://localhost:8080/api/sessions/githubcallback"
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            console.log(profile);
-            
+
             let user = await UserModel.findOne({ email: profile._json.email });
             if (!user) {
                 let newUser = {
@@ -97,7 +96,7 @@ const initializePassport = () => {
                 }
                 let result = await UserModel.create(newUser);
                 done(null, result);
-            }else {
+            } else {
                 done(null, user);
             }
 
@@ -106,6 +105,28 @@ const initializePassport = () => {
             return done(error);
         }
     }))
+
+    passport.use("current", new LocalStrategy({ passReqToCallback: true }, async (req, username, password, done) => {
+        // Recupero el token de la cookie
+        const token = req.cookies.token;
+
+        if (!token) {
+            return done(null, false, { message: 'No se proporcionó un token.' });
+        }
+
+        try {
+            const decoded = jwt.verify(token, 'secreto');
+            const user = await UserModel.findById(decoded.id);
+
+            if (!user) {
+                return done(null, false, { message: 'Usuario asociado al token no encontrado.' });
+            }
+            return done(null, user);
+
+        } catch (error) {
+            return done(error);
+        }
+    }));
 
 
 }

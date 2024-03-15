@@ -9,9 +9,6 @@ const productManager = new ProductManager();
 router.get("/", async (req, res) => {
     try {
 
-        console.log("*** products.router req.query:" + req.query)
-        console.log("*** products.router req.query.category:" + req.query.category)
-
         let limit = parseInt(req.query.limit) || 10;
         let page = parseInt(req.query.page) || 1;
         let category = req.query.category || "";

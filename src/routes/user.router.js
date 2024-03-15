@@ -7,19 +7,13 @@ router.post("/", passport.authenticate("register", {
 }), async (req, res) => {
     if (!req.user) return res.status(400).send({ status: "error", message: "Credenciales invalidas" });
 
-    req.session.user = {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        age: req.user.age,
-        email: req.user.email
-    };
-
+    req.session.user = req.user;
     req.session.login = true;
 
     res.redirect("/api/products");
 })
 
-router.get("/failedregister", (req, res) => {
+router.get("/api/users/failedregister", (req, res) => {
     res.send({ error: "Registro fallido, verifique credenciales" });
 })
 

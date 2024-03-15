@@ -57,11 +57,9 @@ class Server {
         this.app.use(passport.initialize());
         this.app.use(passport.session());
 
+        // Routing
         this.app.use("/api/users", userRouter);
         this.app.use("/api/sessions", sessionRouter);
-
-
-        // Routing
         this.app.use("/api/products", productsRouter);
         this.app.use("/api/carts", cartRouter);
         this.app.use("/", viewsRouter);
