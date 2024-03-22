@@ -3,7 +3,7 @@ const router = express.Router();
 const passport = require("passport");
 
 router.post("/", passport.authenticate("register", {
-    failureRedirect: "/failedregister"
+    failureRedirect: "/api/users/failedregister"
 }), async (req, res) => {
     if (!req.user) return res.status(400).send({ status: "error", message: "Credenciales invalidas" });
 
@@ -13,7 +13,7 @@ router.post("/", passport.authenticate("register", {
     res.redirect("/api/products");
 })
 
-router.get("/api/users/failedregister", (req, res) => {
+router.get("/failedregister", (req, res) => {
     res.send({ error: "Registro fallido, verifique credenciales" });
 })
 

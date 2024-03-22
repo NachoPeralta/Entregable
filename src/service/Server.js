@@ -7,6 +7,8 @@ const socket = require("socket.io");
 const viewsRouter = require("../routes/views.router.js");
 const path = require("path");
 const db = require("./database.js");
+const confiObj = require("../config/config.js");
+const env = confiObj;
 
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
@@ -21,7 +23,7 @@ class Server {
     // Se crea una instancia de express para crear el servidor.
     constructor() {
         this.app = express();
-        this.port = 8080;
+        this.port = env.port;
     }
 
     // Se crea un método para levantar el servidor al iniciar la aplicación.

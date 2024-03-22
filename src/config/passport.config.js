@@ -5,6 +5,9 @@ const GitHubStrategy = require("passport-github2");
 const UserModel = require("../models/user.model.js");
 const { createHash, isValidPassword } = require("../utils/hashBcrypt.js");
 
+const confiObj = require("../config/config.js");
+const env = confiObj;
+
 const LocalStrategy = local.Strategy;
 
 const initializePassport = () => {
@@ -25,6 +28,10 @@ const initializePassport = () => {
                 age,
                 password: createHash(password),
                 role: role ? role : "user"
+            }
+            if (newUser.age < 18) {
+                error = "Para registrarte a este eCommerce debes ser mayor de 18 años"
+                return done(error);
             }
 
             let result = await UserModel.create(newUser);
@@ -55,7 +62,7 @@ const initializePassport = () => {
                 // Si no es el admin, realiza la búsqueda normal en la base de datos
                 const user = await UserModel.findOne({ email });
                 if (!user) {
-                    console.log("Usuario no encontrado");
+                    
                     return done(null, false);
                 }
 
@@ -115,7 +122,7 @@ const initializePassport = () => {
         }
 
         try {
-            const decoded = jwt.verify(token, 'secreto');
+            const decoded = jwt.verify(token, env.secretWord);
             const user = await UserModel.findById(decoded.id);
 
             if (!user) {
