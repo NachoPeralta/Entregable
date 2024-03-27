@@ -63,7 +63,8 @@ class CartController {
             }
 
             const { quantity } = req.body;
-            cart = await cartService.addProductToCart(cart.cid, product.pid, quantity);
+            
+            cart = await cartService.addProductToCart(cart, product, quantity);
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "No se pudo agregar el producto al carrito" });
                 return;
@@ -94,7 +95,7 @@ class CartController {
 
     async deleteProductFromCart(req, res) {
         try {
-            const cart = await cartService.getCartById(req.params.cid);
+            let cart = await cartService.getCartById(req.params.cid);
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "Carrito no encontrado" });
                 return;
@@ -170,9 +171,6 @@ class CartController {
         }
     }
 }
-
-
-
 
 
 module.exports = CartController;

@@ -21,7 +21,7 @@ class CartService {
         return cart;
     }
 
-    async addProductToCart(cid, pid, quantity) {
+    async addProductToCart(cid, pid, quantity) {        
         const cart = dbCartManager.addProductToCart(cid, pid, quantity);
         return cart;
     }
@@ -42,3 +42,5 @@ class CartService {
     }
     
 }
+
+module.exports = CartService;
