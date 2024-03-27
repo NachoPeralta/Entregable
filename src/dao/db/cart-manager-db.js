@@ -51,8 +51,7 @@ class CartManager {
             }
             
             const productExist = cart.products.find(product => product.product.id === productId.id);
-            console.log("*** productExist:", productExist);
-
+           
             if (productExist) {
                 productExist.quantity += quantity;
             } else {

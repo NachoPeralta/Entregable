@@ -93,7 +93,6 @@ class ProductManager {
 
     async getProductById(id) {
         try {
-            console.log("*** getProductById id:" + id )
             const product = await ProductModel.findById(id);
             
             if (!product) {
