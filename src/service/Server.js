@@ -70,24 +70,37 @@ class Server {
             console.log(`Servidor escuchando en el puerto ${this.port}`);
         });
 
-        //Chat
+        //Chat y RealTimeProducts
         const MessageModel = require("../models/message.model.js");
+        const ProductService = require("../service/productService.js");
+        const productService = new ProductService();
 
         const io = new socket.Server(httpServer);
 
-        io.on("connection", (socket) => {
-            console.log("Nuevo usuario conectado");
-
+        io.on("connection", async (socket) => {
             socket.on("message", async data => {
-
                 //Guardo el mensaje en MongoDB: 
                 await MessageModel.create(data);
 
                 //Obtengo los mensajes de MongoDB y se los paso al cliente: 
                 const messages = await MessageModel.find();
-
                 io.sockets.emit("message", messages);
             })
+
+            socket.emit("products", await productService.getProducts());
+
+            // Agregar nuevo producto
+            socket.on("addProduct", async (product) => {
+                await productService.addProduct(product);
+                io.sockets.emit("products", await productService.getProducts());
+            });
+
+            // Eliminar producto
+            socket.on("deleteProduct", async (id) => {
+                await productService.deleteProduct(id);
+                io.sockets.emit("products", await productService.getProducts());
+            });
+
         })
     }
 }

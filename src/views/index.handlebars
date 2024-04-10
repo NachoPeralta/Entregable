@@ -43,10 +43,10 @@
     </tbody>
   </table>
   {{#if hasPrevPage}}
-    <a href="/api/products?page={{prevPage}}&limit={{limit}}&category={{category}}"> Anterior </a>
+    <a href="/products?page={{prevPage}}&limit={{limit}}&category={{category}}"> Anterior </a>
   {{/if}}
   {{#if hasNextPage}}
-    <a href="/api/products?page={{nextPage}}&limit={{limit}}&category={{category}}"> Siguiente </a>
+    <a href="/products?page={{nextPage}}&limit={{limit}}&category={{category}}"> Siguiente </a>
   {{/if}}
   <p>Pagina {{page}} de {{totalPages}} </p>
 </div>

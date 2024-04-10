@@ -35,4 +35,3 @@ socket.on("message", data => {
 
     log.innerHTML = messages;
 })
-

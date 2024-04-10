@@ -20,11 +20,11 @@ class ProductController {
             }
 
             const result = products.docs.map(product => {
-                const { _id, ...rest } = product;
+                const {...rest } = product;
                 return rest;
             });
 
-            res.render("index", {
+            res.status(200).send({
                 status: "success",
                 payload: result,
                 totalPages: products.totalPages,
@@ -39,11 +39,11 @@ class ProductController {
                 page: page,
                 category: category,
                 title: title,
-                first_name: req.user.first_name,
-                last_name: req.user.last_name,
-                age: req.user.age,
-                email: req.user.email,
-                role: req.user.role
+                first_name: req.user ? req.user.first_name : null,
+                last_name: req.user ? req.user.last_name : null,
+                age: req.user ? req.user.age : null,
+                email: req.user ? req.user.email : null,
+                role: req.user ? req.user.role : null
             });
 
         } catch (error) {
@@ -102,12 +102,12 @@ class ProductController {
 
     async deleteProduct(req, res) {
         try {
-            const products = await productManager.deleteProduct(req.params.pid);
-            if (!products) {
+            const deletedProduct = await productService.deleteProduct(req.params.pid);
+            if (!deletedProduct) {
                 res.status(404).send({ status: "Error", error: "Producto no encontrado" });
                 return;
             }
-            res.status(200).send({ status: "Success", products: products });
+            res.status(200).send({ status: "Success", deletedProduct: deletedProduct });
         } catch (error) {
             res.status(401).send({ status: "Error", error: "No se pudo eliminar el producto" });
             console.log(error);

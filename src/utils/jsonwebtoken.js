@@ -1,9 +1,11 @@
 const jwt = require('jsonwebtoken');
+const confiObj = require("../config/config.js");
+const env = confiObj;
 
-const privateKey = "secretWordToken";
+const privateKey = env.secretWord;
 
 const generateToken = (user) => {
-    const token = jwt.sign(user, privateKey, {expiresIn: "24h"});
+    const token = jwt.sign(user, privateKey, {expiresIn: "2h"});
 
     return token;    
 }

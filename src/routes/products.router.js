@@ -23,7 +23,7 @@ router.post("/", productController.addProduct);
 router.put("/:pid", productController.updateProduct);
 
 
-// Elimina un producto y devuelve la lista completa de productos
+// Elimina un producto y devuelve el producto borrado
 router.delete("/:pid", productController.deleteProduct);
 
 

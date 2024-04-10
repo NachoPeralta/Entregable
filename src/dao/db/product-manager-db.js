@@ -32,11 +32,17 @@ class ProductManager {
         return product;
     }
 
-    async getProducts(limit, page, category, sort) {
+    async getProducts(limit = 10, page = 1, category, sort) {
+        console.log("product-manager getProducts");
+        console.log("limit:" + limit);
+        console.log("page: " + page);
+        console.log("category: " + category);
+        console.log("sort: " + sort);
+
         try {
 
             let criteria = [];
-            
+
             // Filtro por categoría si se proporciona en query
             if (category) {
                 criteria.push({
@@ -58,8 +64,16 @@ class ProductManager {
             const totalProducts = await ProductModel.countDocuments(criteria[0]?.['$match']);
 
             // Paginación
+            page = parseInt(page);
+            limit = parseInt(limit);
+            if (isNaN(page) || isNaN(limit)) {
+                throw new Error("La página y el límite deben ser números válidos.");
+            }
+
+            // Paginación
+            const skipCount = (page - 1) * limit;
             criteria.push({
-                $skip: (page - 1) * limit,
+                $skip: skipCount,
             }, {
                 $limit: limit,
             });
@@ -94,7 +108,7 @@ class ProductManager {
     async getProductById(id) {
         try {
             const product = await ProductModel.findById(id);
-            
+
             if (!product) {
                 console.log("Producto no encontrado");
                 return null;

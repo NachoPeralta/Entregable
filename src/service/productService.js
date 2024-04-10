@@ -25,6 +25,11 @@ class ProductService {
         return updatedProduct;
     }
 
+    async deleteProduct(id) {
+        const deletedProduct = await dbProductManager.deleteProduct(id);
+        return deletedProduct;
+    }
+
 }
 
 module.exports = ProductService;

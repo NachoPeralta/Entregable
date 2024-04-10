@@ -10,18 +10,24 @@ const userModel = require("../models/user.model.js");
 
 router.post("/login", passport.authenticate("login", { failureRedirect: "/api/sessions/faillogin" }), async (req, res) => {
 
-    if (!req.user) { 
+    if (!req.user) {
         req.session.error = "Usuario no encontrado";
-        req.session.message = "vuelva a intentar";    
-     
-        res.status(400).redirect("/faillogin"); 
+        req.session.message = "vuelva a intentar";
+
+        res.status(400).redirect("/faillogin");
     }
 
     req.session.user = req.user;
 
     req.session.login = true;
 
-    res.redirect("/api/products");
+    const token = generateToken({ user: req.user });
+    res.cookie("coderCookieToken", token, {
+        maxAge: 3600000,
+        httpOnly: true
+    });
+
+    res.redirect("/products");
 })
 
 router.get("/logout", (req, res) => {
@@ -35,7 +41,7 @@ router.get("/faillogin", async (req, res) => {
 
     error = req.session.error != null ? req.session.error : "Error de ingreso";
     message = req.session.message != null ? req.session.message : "Verifique credenciales o ingrese a Nuevo Registro";
-    
+
     res.render("error", {
         error,
         message
@@ -57,7 +63,7 @@ router.get("/githubcallback", passport.authenticate("github", { failureRedirect:
 
     req.session.login = true;
 
-    res.redirect("/api/products");
+    res.redirect("/products");
 });
 
 router.post("/register", async (req, res) => {
@@ -75,7 +81,11 @@ router.post("/register", async (req, res) => {
 
         const newUser = await req.userModel.create({ first_name, last_name, age, email, password: createHash(password) });
 
-        const token = generateToken({ id: newUser._id });
+        const token = generateToken({ user: newUser });
+        res.cookie("coderCookieToken", token, {
+            maxAge: 3600000,
+            httpOnly: true
+        });
 
         res.status(200).send({ status: "success", message: "Usuario creado con éxito", payload: newUser, token });
 
