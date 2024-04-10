@@ -1,5 +1,8 @@
 const passport = require("passport");
 const local = require("passport-local");
+const jwt = require("passport-jwt");
+const JWTStrategy = jwt.Strategy;
+const ExtractJwt = jwt.ExtractJwt;
 const GitHubStrategy = require("passport-github2");
 
 const UserModel = require("../models/user.model.js");
@@ -44,36 +47,31 @@ const initializePassport = () => {
     }))
 
 
-    passport.use("login", new LocalStrategy({
-        usernameField: "email"
-    }, async (email, password, done) => {
+    passport.use("jwt", new JWTStrategy({
+        jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+        secretOrKey: env.secretWord
+    }, async (jwt_payload, done) => {
+
+        console.log("*** passport jwt - jwt_payload:" + jwt_payload);
+
         try {
-            if (email === "adminCoder@coder.com" && password === "adminCod3r123") {
-                const adminUser = {
-                    _id: "admin",
-                    first_name: "Admin",
-                    last_name: "Admin",
-                    email: "admin",
-                    age: 40,
-                    role: "admin"
-                };
-                return done(null, adminUser);
-            } else {
-                // Si no es el admin, realiza la búsqueda normal en la base de datos
-                const user = await UserModel.findOne({ email });
-                if (!user) {
-                    
-                    return done(null, false);
-                }
+            // Busca el usuario en la base de datos usando el ID del payload JWT
+            const user = await UserModel.findById(jwt_payload.user._id);
+            if (!user) {
+                console.log("*** nose encontro user");
 
-                if (!isValidPassword(password, user)) return done(null, false);
-
-                return done(null, user);
+                return done(null, false);
             }
+
+            console.log("*** encontro user:" + user);
+
+            return done(null, user); // Devuelve el usuario encontrado
         } catch (error) {
+            console.log("*** error:" + error);
+            
             return done(error);
         }
-    }))
+    }));
 
 
     passport.serializeUser((user, done) => {
@@ -136,6 +134,14 @@ const initializePassport = () => {
     }));
 
 
+}
+
+const cookieExtractor = (req) => {
+    let token = null;
+    if (req && req.cookies) {
+        token = req.cookies["coderCookieToken"]
+    }
+    return token;
 }
 
 

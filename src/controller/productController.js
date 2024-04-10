@@ -1,5 +1,5 @@
 
-const ProductService = require("../service/productService.js");
+const ProductService = require("../repositories/product.repository");
 const productService = new ProductService();
 
 class ProductController {

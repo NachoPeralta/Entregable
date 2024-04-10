@@ -1,14 +1,14 @@
-const CartService = require("../service/cartService.js");
-const cartService = new CartService();
+const CartRepository = require("../repositories/cart.repository.js");
+const cartRepository = new CartRepository();
 
-const ProductService = require("../service/productService.js");
-const productService = new ProductService();
+const ProductRepository = require("../repositories/product.repository.js");
+const productRepository = new ProductRepository();
 
 class CartController {
 
     async getCarts(req, res) {
         try {
-            const carts = await cartService.getCarts();
+            const carts = await cartRepository.getCarts();
             res.status(200).send({ status: "success", cart: carts });
         } catch (error) {
             console.log(error);
@@ -18,7 +18,7 @@ class CartController {
 
     async getCartById(req, res) {
         try {
-            const cart = await cartService.getCartById(req.params.cid);
+            const cart = await cartRepository.getCartById(req.params.cid);
 
             if (cart) {
                 res.render("cart", {
@@ -39,7 +39,7 @@ class CartController {
 
     async createCart(req, res) {
         try {
-            const cart = await cartService.createCart();
+            const cart = await cartRepository.createCart();
             res.status(201).send({ status: "Success", cart: cart });
         } catch (error) {
             res.status(401).send({ status: "Error", error: "No se pudo crear el carrito" });
@@ -50,13 +50,13 @@ class CartController {
 
     async addProductToCart(req, res) {
         try {
-            let cart = await cartService.getCartById(req.params.cid);
+            let cart = await cartRepository.getCartById(req.params.cid);
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "Carrito no encontrado" });
                 return;
             }
 
-            const product = await productService.getProductById(req.params.pid);
+            const product = await productRepository.getProductById(req.params.pid);
             if (!product) {
                 res.status(404).send({ status: "Error", error: "Producto no encontrado" });
                 return;
@@ -64,7 +64,7 @@ class CartController {
 
             const { quantity } = req.body;
             
-            cart = await cartService.addProductToCart(cart, product, quantity);
+            cart = await cartRepository.addProductToCart(cart, product, quantity);
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "No se pudo agregar el producto al carrito" });
                 return;
@@ -80,7 +80,7 @@ class CartController {
 
     async emptyCart(req, res) {
         try {
-            const cart = await cartService.emptyCart(req.params.cid);
+            const cart = await cartRepository.emptyCart(req.params.cid);
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "Carrito no encontrado" });
                 return;
@@ -95,13 +95,13 @@ class CartController {
 
     async deleteProductFromCart(req, res) {
         try {
-            let cart = await cartService.getCartById(req.params.cid);
+            let cart = await cartRepository.getCartById(req.params.cid);
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "Carrito no encontrado" });
                 return;
             }
 
-            cart = await cartService.deleteProductFromCart(req.params.cid, req.params.pid);
+            cart = await cartRepository.deleteProductFromCart(req.params.cid, req.params.pid);
             if (!cart) {
                 res.status(401).send({ status: "Error", error: "Error al eliminar productos en el carrito" });
                 return;
@@ -125,7 +125,7 @@ class CartController {
         if (cartId === 'undefined') return res.status(400).json({ error: 'El ID del carrito es requerido' });
 
         try {
-            const updatedCart = await cartService.updateCartProducts(cartId, updatedProducts);
+            const updatedCart = await cartRepository.updateCartProducts(cartId, updatedProducts);
             if (!updatedCart) {
                 return res.status(404).json({ error: 'Carrito no encontrado' });
             }
@@ -150,13 +150,13 @@ class CartController {
             if (cartId === 'undefined') return res.status(400).json({ error: 'El ID del carrito es requerido' });
             if (productId === 'undefined') return res.status(400).json({ error: 'El ID del producto es requerido' });
 
-            const cart = await cartService.getCartById(cartId);
+            const cart = await cartRepository.getCartById(cartId);
             if (!cart) return res.status(404).json({ error: 'Carrito no encontrado' });
 
-            const product = await productService.getProductById(productId);
+            const product = await productRepository.getProductById(productId);
             if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
 
-            const updatedCart = await cartService.addProductToCart(cartId, productId, newQuantity);
+            const updatedCart = await cartRepository.addProductToCart(cartId, productId, newQuantity);
 
             res.json({
                 status: 'success',

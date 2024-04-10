@@ -1,20 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const UserController = require("../controller/userController");
+const userController = new UserController();
 
-router.post("/", passport.authenticate("register", {
-    failureRedirect: "/api/users/failedregister"
-}), async (req, res) => {
-    if (!req.user) return res.status(400).send({ status: "error", message: "Credenciales invalidas" });
+router.post("/register", userController.register);
+router.post("/login", userController.login);
+router.get("/profile", passport.authenticate("jwt", { session: false }), userController.profile);
+router.post("/logout", userController.logout.bind(userController));
+router.get("/admin", passport.authenticate("jwt", { session: false }), userController.admin);
 
-    req.session.user = req.user;
-    req.session.login = true;
-
-    res.redirect("/api/products");
-})
-
-router.get("/failedregister", (req, res) => {
-    res.send({ error: "Registro fallido, verifique credenciales" });
-})
-
-module.exports = router; 
+module.exports = router;

@@ -2,7 +2,7 @@ const ProductManager = require("../dao/db/product-manager-db.js");
 const dbProductManager = new ProductManager();
 
 
-class ProductService {
+class ProductRepository {
 
     async getProducts(limit, page, category, sort) {
 
@@ -32,4 +32,4 @@ class ProductService {
 
 }
 
-module.exports = ProductService;
+module.exports = ProductRepository;

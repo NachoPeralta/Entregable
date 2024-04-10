@@ -4,7 +4,7 @@ const dbCartManager = new CartManager();
 const ProductManager = require("../dao/db/product-manager-db.js");
 const dbProductManager = new ProductManager();
 
-class CartService {
+class CartRepository {
 
     async getCarts() {
         const carts = await dbCartManager.getCarts();
@@ -43,4 +43,4 @@ class CartService {
     
 }
 
-module.exports = CartService;
+module.exports = CartRepository;

@@ -1,23 +1,27 @@
+//Complementos
 const express = require("express");
-const productsRouter = require("../routes/products.router");
-const cartRouter = require("../routes/cart.router.js");
 const { create } = require('express-handlebars');
-
-const socket = require("socket.io");
-const viewsRouter = require("../routes/views.router.js");
-const path = require("path");
-const db = require("./database.js");
-const confiObj = require("../config/config.js");
-const env = confiObj;
-
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const userRouter = require("../routes/user.router.js");
-const sessionRouter = require("../routes/sessions.router.js");
-
 const passport = require("passport");
 const initializePassport = require("../config/passport.config.js");
+
+//Routers
+const productsRouter = require("../routes/products.router");
+const cartRouter = require("../routes/cart.router.js");
+const userRouter = require("../routes/user.router.js");
+const viewsRouter = require("../routes/views.router.js");
+
+//Conexión
+const socket = require("socket.io");
+const MongoStore = require("connect-mongo");
+require("./database.js");
+
+//Configuración
+const path = require("path");
+const cors = require("cors");
+const confiObj = require("../config/config.js");
+const env = confiObj;
 
 class Server {
     // Se crea una instancia de express para crear el servidor.
@@ -28,10 +32,12 @@ class Server {
 
     // Se crea un método para levantar el servidor al iniciar la aplicación.
     async start() {
+        //Middleware
         this.app.use(express.static(path.join(__dirname, "../public")));
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(express.json());
         this.app.use(cookieParser());
+        this.app.use(cors());
 
         const hbs = create({
             runtimeOptions: {
@@ -57,11 +63,10 @@ class Server {
         // Passport
         initializePassport();
         this.app.use(passport.initialize());
-        this.app.use(passport.session());
-
+        this.app.use(cookieParser());
+        
         // Routing
         this.app.use("/api/users", userRouter);
-        this.app.use("/api/sessions", sessionRouter);
         this.app.use("/api/products", productsRouter);
         this.app.use("/api/carts", cartRouter);
         this.app.use("/", viewsRouter);
@@ -72,9 +77,8 @@ class Server {
 
         //Chat y RealTimeProducts
         const MessageModel = require("../models/message.model.js");
-        const ProductService = require("../service/productService.js");
-        const productService = new ProductService();
-
+        const ProductRepository = require("../repositories/product.repository.js");
+        const productRepository = new ProductRepository();
         const io = new socket.Server(httpServer);
 
         io.on("connection", async (socket) => {
@@ -87,18 +91,18 @@ class Server {
                 io.sockets.emit("message", messages);
             })
 
-            socket.emit("products", await productService.getProducts());
+            socket.emit("products", await productRepository.getProducts());
 
             // Agregar nuevo producto
             socket.on("addProduct", async (product) => {
-                await productService.addProduct(product);
-                io.sockets.emit("products", await productService.getProducts());
+                await productRepository.addProduct(product);
+                io.sockets.emit("products", await productRepository.getProducts());
             });
 
             // Eliminar producto
             socket.on("deleteProduct", async (id) => {
-                await productService.deleteProduct(id);
-                io.sockets.emit("products", await productService.getProducts());
+                await productRepository.deleteProduct(id);
+                io.sockets.emit("products", await productRepository.getProducts());
             });
 
         })
