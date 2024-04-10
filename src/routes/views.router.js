@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const ProductManager = require("../dao/db/product-manager-db");
 const productManager = new ProductManager();
+const ViewsController = require("../controller/viewsController.js");
+const viewsController = new ViewsController();
+const checkUserRole = require("../utils/checkrole.js");
+const passport = require("passport");
 
 router.get("/realtimeproducts", async (req, res) => {
     try {
@@ -47,5 +51,10 @@ router.get("/profile", (req, res) => {
     // Renderiza la vista de perfil con los datos del usuario
     res.render("profile", { user: req.session.user });
 });
+
+
+router.get("/products", checkUserRole(['usuario']),passport.authenticate('jwt', { session: false }), viewsController.renderProducts(viewsController));
+
+
 
 module.exports = router; 
