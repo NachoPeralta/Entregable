@@ -1,6 +1,6 @@
 const UserModel = require("../models/user.model.js");
 const CartModel = require("../models/cart.model.js");
-const jwt = require("jsonwebtoken");
+const { generateToken } = require("../utils/jsonwebtoken.js");
 const { createHash, isValidPassword } = require("../utils/hashBcrypt.js");
 const UserDTO = require("../dto/user.dto.js");
 
@@ -48,15 +48,22 @@ class UserController {
             const userExist = await UserModel.findOne({ email });
 
             if (!userExist) {
-                return res.status(401).send("Usuario no encontrado");
+                req.error = "Usuario no encontrado";
+                req.message = "vuelva a intentar";
+
+                return res.status(401).redirect("/api/users/faillogin");
             }
 
-            const isValidPassword = isValidPassword(password, userExist);
-            if (!isValidPassword) {
-                return res.status(401).send("Error de credenciales");
+            const isValid = isValidPassword(password, userExist);
+
+            if (!isValid) {
+                req.error = "Error de credenciales";
+                req.message = "vuelva a intentar";
+
+                return res.status(401).redirect("/api/users/faillogin");
             }
 
-            const token = generateToken({ user: newUser });
+            const token = generateToken({ user: userExist });
             res.cookie("coderCookieToken", token, {
                 maxAge: 3600000,
                 httpOnly: true
@@ -78,7 +85,9 @@ class UserController {
 
     async logout(req, res) {
         res.clearCookie("coderCookieToken");
-        res.redirect("/login");
+        req.session.destroy();
+        res.redirect("/");
+        //res.redirect("/login");
     }
 
     async admin(req, res) {
@@ -86,6 +95,16 @@ class UserController {
             return res.status(403).send("Acceso denegado");
         }
         res.render("admin");
+    }
+
+    async failLogin(req, res) {
+        const error = req.error != null ? req.error : "Error de ingreso";
+        const message = req.message != null ? req.message : "Verifique credenciales o ingrese a Nuevo Registro";
+
+        res.render("error", {
+            error,
+            message
+        });
     }
 }
 

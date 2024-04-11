@@ -1,6 +1,6 @@
 
-const ProductService = require("../repositories/product.repository");
-const productService = new ProductService();
+const ProductRepository = require("../repositories/product.repository");
+const productRepository = new ProductRepository();
 
 class ProductController {
 
@@ -12,7 +12,7 @@ class ProductController {
             let sort = req.query.sort || "asc";
             let title = "Listado de Productos"
 
-            const products = await productService.getProducts(limit, page, category, sort);
+            const products = await productRepository.getProducts(limit, page, category, sort);
 
             if (!products) {
                 res.status(404).send({ status: "error", error: "No se encontraron productos" });
@@ -43,6 +43,7 @@ class ProductController {
                 last_name: req.user ? req.user.last_name : null,
                 age: req.user ? req.user.age : null,
                 email: req.user ? req.user.email : null,
+                cartId: req.user ? req.user.cartId : null,
                 role: req.user ? req.user.role : null
             });
 
@@ -53,7 +54,7 @@ class ProductController {
     }
 
     async getProductById(req, res) {
-        const product = await productService.getProductById(req.params.pid);
+        const product = await productRepository.getProductById(req.params.pid);
 
         if (product) {
             res.status(200).send({ status: "Success", product: product });
@@ -68,7 +69,7 @@ class ProductController {
 
             console.log("Producto Nuevo:" + product);
 
-            const newProduct = await productService.addProduct(product);
+            const newProduct = await productRepository.addProduct(product);
             if (!newProduct) {
                 res.status(400).send({ status: "Error", error: "No se pudo agregar el producto, verifique los datos ingresados" });
                 return;
@@ -86,7 +87,7 @@ class ProductController {
 
         try {
             const product = req.body;
-            const updatedProduct = await productService.updateProduct(req.params.pid, product);
+            const updatedProduct = await productRepository.updateProduct(req.params.pid, product);
             if (!updatedProduct) {
                 res.status(404).send({ status: "Error", error: "Producto no encontrado" });
                 return;
@@ -102,7 +103,7 @@ class ProductController {
 
     async deleteProduct(req, res) {
         try {
-            const deletedProduct = await productService.deleteProduct(req.params.pid);
+            const deletedProduct = await productRepository.deleteProduct(req.params.pid);
             if (!deletedProduct) {
                 res.status(404).send({ status: "Error", error: "Producto no encontrado" });
                 return;

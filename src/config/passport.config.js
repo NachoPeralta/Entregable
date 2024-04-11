@@ -52,23 +52,16 @@ const initializePassport = () => {
         secretOrKey: env.secretWord
     }, async (jwt_payload, done) => {
 
-        console.log("*** passport jwt - jwt_payload:" + jwt_payload);
-
         try {
             // Busca el usuario en la base de datos usando el ID del payload JWT
             const user = await UserModel.findById(jwt_payload.user._id);
-            if (!user) {
-                console.log("*** nose encontro user");
-
+            if (!user) {                
                 return done(null, false);
             }
 
-            console.log("*** encontro user:" + user);
-
             return done(null, user); // Devuelve el usuario encontrado
         } catch (error) {
-            console.log("*** error:" + error);
-            
+            console.log("*** error:" + error);            
             return done(error);
         }
     }));
@@ -86,10 +79,12 @@ const initializePassport = () => {
     passport.use("github", new GitHubStrategy({
         clientID: "Iv1.f383f655e2d276ed",
         clientSecret: "20349f1d5bbb3030c03f5da09bae4f3ff9b45927",
-        callbackURL: "http://localhost:8080/api/sessions/githubcallback"
+        callbackURL: "http://localhost:8080/api/users/githubcallback"
     }, async (accessToken, refreshToken, profile, done) => {
         try {
+            console.log("GITHUB LOGIN Email:" + profile._json.email);
 
+            
             let user = await UserModel.findOne({ email: profile._json.email });
             if (!user) {
                 let newUser = {
@@ -132,8 +127,6 @@ const initializePassport = () => {
             return done(error);
         }
     }));
-
-
 }
 
 const cookieExtractor = (req) => {

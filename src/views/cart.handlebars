@@ -21,14 +21,53 @@
           <td>{{this.quantity}}</td>
           <td>{{this.product.price}}</td>
           <td>
-            <button
-              class="btnDeleteProductFromCart"
-              data-product-id="{{this.product._id}}"
-            >Eliminar</button>
+            <button class="btnDeleteProductFromCart" 
+              onclick="deleteProduct('{{../cartId}}', '{{this.product._id}}')"
+              >Eliminar</button>
           </td>
         </tr>
       {{/each}}
     </tbody>
   </table>
-  <h4>Total a Pagar:</h4>
+  <br>
+  <button onclick="emptyCart('{{cartId}}')" >Vaciar Carrito</button>
+  <br>
+  <h4>Total a Pagar:{{totalBuy}}</h4>
 </div>
+<br />
+<a href="/chat">Chat en vivo</a>
+<br />
+<a href="/products">Tienda</a>
+<br />
+
+<script>
+    function deleteProduct(cartId, productId) {
+        fetch(`/api/carts/${cartId}/products/${productId}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al eliminar el producto del carrito');
+                }
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function emptyCart(cartId) {
+        fetch(`/api/carts/${cartId}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al vaciar el carrito');
+                }
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>

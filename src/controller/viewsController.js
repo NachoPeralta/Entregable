@@ -1,72 +1,80 @@
 const ProductModel = require("../models/products.model.js");
 const CartRepository = require("../repositories/cart.repository.js");
 const cartRepository = new CartRepository();
+const ProductRepository = require("../repositories/product.repository.js");
+const productRepository = new ProductRepository();
 
 class ViewsController {
     async renderProducts(req, res) {
         try {
-            const { page = 1, limit = 3 } = req.query;
+            let limit = parseInt(req.query.limit) || 10;
+            let page = parseInt(req.query.page) || 1;
+            let category = req.query.category || "";
+            let sort = req.query.sort || "asc";
+            let title = "Listado de Productos"
 
-            const skip = (page - 1) * limit;
+            const products = await productRepository.getProducts(limit, page, category, sort);
 
-            const products = await ProductModel
-                .find()
-                .skip(skip)
-                .limit(limit);
+            if (!products) {
+                res.status(404).send({ status: "error", error: "No se encontraron productos" });
+                return;
+            }
 
-            const totalProducts = await ProductModel.countDocuments();
-
-            const totalPages = Math.ceil(totalProducts / limit);
-
-            const hasPrevPage = page > 1;
-            const hasNextPage = page < totalPages;
-
-
-            const result = products.map(product => {
-                const { _id, ...rest } = product.toObject();
-                return { id: _id, ...rest }; 
+            const result = products.docs.map(product => {
+                const { ...rest } = product;
+                return rest;
             });
 
 
-            const cartId = req.user.cart.toString();
-            
             res.render("products", {
-                products: result,
-                hasPrevPage,
-                hasNextPage,
-                prevPage: page > 1 ? parseInt(page) - 1 : null,
-                nextPage: page < totalPages ? parseInt(page) + 1 : null,
-                currentPage: parseInt(page),
-                totalPages,
-                cartId
+                status: "success",
+                payload: result,
+                totalPages: products.totalPages,
+                prevPage: products.prevPage,
+                nextPage: products.nextPage,
+                currentPage: products.page,
+                hasPrevPage: products.hasPrevPage,
+                hasNextPage: products.hasNextPage,
+                prevLink: products.hasPrevPage ? `/products?page=${products.prevPage}` : null,
+                nextLink: products.hasNextPage ? `/products?page=${products.nextPage}` : null,
+                limit: limit,
+                page: page,
+                category: category,
+                title: title,
+                first_name: req.user ? req.user.first_name : null,
+                last_name: req.user ? req.user.last_name : null,
+                age: req.user ? req.user.age : null,
+                email: req.user ? req.user.email : null,
+                cartId: req.user ? req.user.cart : null,
+                role: req.user ? req.user.role : null
             });
 
         } catch (error) {
-            console.error("Error al obtener productos", error);
-            res.status(500).json({
-                status: 'error',
-                error: "Error interno del servidor"
-            });
+            console.log("Error al traer los productos", error);
+            res.status(401).send({ status: "error", error: "Error al traer los productos" });
         }
     }
 
     async renderCart(req, res) {
         const cartId = req.params.cid;
+        const title = "Carrito";
+        const cartInfo = "Aquí tienes toda la información de tu Carrito";
+
         try {
             const cart = await cartRepository.getCartById(cartId);
 
-            if (!cart) {                
+            if (!cart) {
                 return res.status(404).json({ error: "Carrito no encontrado" });
             }
 
             let totalBuy = 0;
 
-            const cartProducts = carrito.products.map(item => {
+            const cartProducts = cart.products.map(item => {
                 const product = item.product.toObject();
                 const quantity = item.quantity;
                 const totalPrice = product.price * quantity;
 
-                
+
                 totalBuy += totalPrice;
 
                 return {
@@ -76,7 +84,7 @@ class ViewsController {
                 };
             });
 
-            res.render("carts", { products: cartProducts, totalBuy, cartId });
+            res.render("cart", { products: cartProducts, totalBuy, cartId, title, cartInfo });
 
         } catch (error) {
             console.error("Error al obtener el carrito", error);
@@ -92,14 +100,70 @@ class ViewsController {
         res.render("register");
     }
 
+    // async renderRealTimeProducts(req, res) {
+    //     try {
+    //         const products = await ProductModel.find();
+                    
+    //         res.render("realtimeproducts", {
+    //             totalPages: products.totalPages,
+    //             prevPage: products.prevPage,
+    //             nextPage: products.nextPage,
+    //             currentPage: products.page,
+    //             hasPrevPage: products.hasPrevPage,
+    //             hasNextPage: products.hasNextPage,
+    //             prevLink: products.hasPrevPage ? `/realtimeproducts?page=${products.prevPage}` : null,
+    //             nextLink: products.hasNextPage ? `/realtimeproducts?page=${products.nextPage}` : null
+    //         });
+
+    //     } catch (error) {
+    //         console.log("Error en la vista real time", error);
+    //         res.status(500).json({ error: "Error interno del servidor" });
+    //     }
+    // }
+
     async renderRealTimeProducts(req, res) {
         try {
-            res.render("realtimeproducts");
+
+            console.log("*** REAL TIME PRODS");
+            console.log(parseInt(req.query.page));
+            let limit = parseInt(req.query.limit) || 10;
+            let page = parseInt(req.query.page) || 1;
+            let sort = req.query.sort || "asc";
+            let title = "Listado de Productos"
+
+            const products = await productRepository.getProducts(limit, page, null, sort);
+
+            if (!products) {
+                res.status(404).send({ status: "error", error: "No se encontraron productos" });
+                return;
+            }
+
+            const result = products.docs.map(product => {
+                const { ...rest } = product;
+                return rest;
+            });
+    
+            res.render("realtimeproducts", {
+                products: result,
+                totalPages: products.totalPages,
+                prevPage: products.prevPage,
+                nextPage: products.nextPage,
+                currentPage: products.page,
+                hasPrevPage: products.hasPrevPage,
+                hasNextPage: products.hasNextPage,
+                prevLink: products.hasPrevPage ? `/realtimeproducts?page=${products.prevPage}` : null,
+                nextLink: products.hasNextPage ? `/realtimeproducts?page=${products.nextPage}` : null,
+                limit: limit,
+                page: page,                
+                title
+            });
+    
         } catch (error) {
-            console.log("Error en la vista real time", error);
+            console.log("Error en la vista de productos en tiempo real", error);
             res.status(500).json({ error: "Error interno del servidor" });
         }
     }
+    
 
     async renderChat(req, res) {
         res.render("chat");

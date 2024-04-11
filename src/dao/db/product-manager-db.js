@@ -33,12 +33,7 @@ class ProductManager {
     }
 
     async getProducts(limit = 10, page = 1, category, sort) {
-        console.log("product-manager getProducts");
-        console.log("limit:" + limit);
-        console.log("page: " + page);
-        console.log("category: " + category);
-        console.log("sort: " + sort);
-
+    
         try {
 
             let criteria = [];
@@ -107,6 +102,7 @@ class ProductManager {
 
     async getProductById(id) {
         try {
+            
             const product = await ProductModel.findById(id);
 
             if (!product) {

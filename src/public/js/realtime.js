@@ -82,6 +82,31 @@ const renderProducts = (data) => {
         tableBody.appendChild(row);
     });
     table.appendChild(tableBody);
+
+    const paginationDiv = document.createElement("div");
+    paginationDiv.className = "pagination";
+
+    if (data.hasPrevPage) {
+        const prevPageLink = document.createElement("a");
+        prevPageLink.href = `/realtimeproducts?page=${data.prevPage}`;
+        prevPageLink.textContent = "Anterior";
+        paginationDiv.appendChild(prevPageLink);
+    }
+
+    if (data.hasNextPage) {
+        const nextPageLink = document.createElement("a");
+        nextPageLink.href = `/realtimeproducts?page=${data.nextPage}`;
+        nextPageLink.textContent = "Siguiente";
+        paginationDiv.appendChild(nextPageLink);
+    }
+
+    const pageInfoParagraph = document.createElement("p");
+    pageInfoParagraph.textContent = `Página ${data.currentPage} de ${data.totalPages}`;
+    paginationDiv.appendChild(pageInfoParagraph);
+
+    table.appendChild(paginationDiv);
+
+
 };
 
 const deleteProduct = (id) => {
@@ -90,6 +115,7 @@ const deleteProduct = (id) => {
 
 document.getElementById("btnSend").addEventListener("click", () => {
     addProduct();
+    location.reload();
 });
 
 const addProduct = () => {

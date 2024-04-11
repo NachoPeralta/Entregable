@@ -50,6 +50,7 @@ class CartController {
 
     async addProductToCart(req, res) {
         try {
+            
             let cart = await cartRepository.getCartById(req.params.cid);
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "Carrito no encontrado" });
@@ -62,14 +63,16 @@ class CartController {
                 return;
             }
 
-            const { quantity } = req.body;
+            const quantity = req.body.quantity || 1;
             
             cart = await cartRepository.addProductToCart(cart, product, quantity);
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "No se pudo agregar el producto al carrito" });
                 return;
             }
-            res.status(200).status(200).send({ status: "Success", cart: cart });
+            
+            //res.status(200).send({ status: "Success", cart: cart });
+            res.redirect(`/carts/${cart._id}`);
 
         } catch (error) {
             res.status(401).send({ status: "Error", error: "No se pudo agregar el producto al carrito" });
@@ -95,6 +98,7 @@ class CartController {
 
     async deleteProductFromCart(req, res) {
         try {
+            
             let cart = await cartRepository.getCartById(req.params.cid);
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "Carrito no encontrado" });

@@ -1,5 +1,17 @@
 <h1>Mi Perfil</h1>
 <p>Bienvenido!, {{user.first_name}} {{user.last_name}}!</p>
-<p>Email: {{user.email}}</p>
-<p>Edad: {{user.age}}</p>
-<a href="/api/sessions/logout">Logout</a>
+<br>
+<form action="/api/users/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
+<br>
+
+{{#if this.isAdmin}}
+  <a href="/realtimeproducts">Modificar Productos</a>
+  <br>
+{{else}}
+  <a href="/chat">Chat en vivo</a>
+  <br>
+  <a href="/products">Tienda</a>
+  <br>
+{{/if}}

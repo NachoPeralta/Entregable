@@ -2,7 +2,11 @@
 <h4>Email: {{email}}</h4>
 <h4>Age: {{age}}</h4>
 <h4>Rol: {{role}}</h4>
-<a href="/api/sessions/logout">Logout</a>
+
+<form action="/api/users/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
+
 <br>
 <h2>{{title}}</h2>
 <div>
@@ -26,17 +30,13 @@
           <td>{{this.stock}}</td>
           <td>{{this.price}}</td>
           <td>
-            Cantidad<input
-              id="qtInput"
-              type="number"
-              min="1"
-              max="{{this.stock}}"
-              value="1"
-              data-product-id="{{this._id}}"
-            />
+            Cantidad
           </td>
-          <td>
-            <button class="btnAddToCart" data-product-id="{{this._id}}">Agregar al Carrito</button>          
+          <td>            
+           <form action="/api/carts/{{../cartId}}/products/{{this._id}}" method="POST" onsubmit="return updateAction(this);">
+            <input id="qtInput" type="number" min="1" max="{{this.stock}}" value="1" name="quantity" />
+            <button class="btnAddToCart" type="submit">Agregar al Carrito</button>
+          </form>
           </td>
         </tr>
       {{/each}}
@@ -49,4 +49,13 @@
     <a href="/products?page={{nextPage}}&limit={{limit}}&category={{category}}"> Siguiente </a>
   {{/if}}
   <p>Pagina {{page}} de {{totalPages}} </p>
+
+  <script>
+    function updateAction(form) {
+      let quantity = document.getElementById('qtInput').value;
+      form.action += quantity > 1 ? ("?quantity=" + quantity) : "";
+      return true;
+    }
+  </script>
 </div>
+
