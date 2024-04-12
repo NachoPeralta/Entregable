@@ -100,32 +100,13 @@ class ViewsController {
         res.render("register");
     }
 
-    // async renderRealTimeProducts(req, res) {
-    //     try {
-    //         const products = await ProductModel.find();
-                    
-    //         res.render("realtimeproducts", {
-    //             totalPages: products.totalPages,
-    //             prevPage: products.prevPage,
-    //             nextPage: products.nextPage,
-    //             currentPage: products.page,
-    //             hasPrevPage: products.hasPrevPage,
-    //             hasNextPage: products.hasNextPage,
-    //             prevLink: products.hasPrevPage ? `/realtimeproducts?page=${products.prevPage}` : null,
-    //             nextLink: products.hasNextPage ? `/realtimeproducts?page=${products.nextPage}` : null
-    //         });
-
-    //     } catch (error) {
-    //         console.log("Error en la vista real time", error);
-    //         res.status(500).json({ error: "Error interno del servidor" });
-    //     }
-    // }
-
     async renderRealTimeProducts(req, res) {
         try {
 
             console.log("*** REAL TIME PRODS");
             console.log(parseInt(req.query.page));
+            console.log("*** USER:" + req.user);
+
             let limit = parseInt(req.query.limit) || 10;
             let page = parseInt(req.query.page) || 1;
             let sort = req.query.sort || "asc";
@@ -155,7 +136,10 @@ class ViewsController {
                 nextLink: products.hasNextPage ? `/realtimeproducts?page=${products.nextPage}` : null,
                 limit: limit,
                 page: page,                
-                title
+                title,
+                first_name: req.user ? req.user.first_name : null,
+                last_name: req.user ? req.user.last_name : null,
+                role: req.user ? req.user.role : null,                
             });
     
         } catch (error) {

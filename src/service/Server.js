@@ -64,7 +64,7 @@ class Server {
         initializePassport();
         this.app.use(passport.initialize());
         this.app.use(cookieParser());
-        
+
         // Routing
         this.app.use("/api/users", userRouter);
         this.app.use("/api/products", productsRouter);
@@ -76,36 +76,8 @@ class Server {
         });
 
         //Chat y RealTimeProducts
-        const MessageModel = require("../models/message.model.js");
-        const ProductRepository = require("../repositories/product.repository.js");
-        const productRepository = new ProductRepository();
-        const io = new socket.Server(httpServer);
-
-        io.on("connection", async (socket) => {
-            socket.on("message", async data => {
-                //Guardo el mensaje en MongoDB: 
-                await MessageModel.create(data);
-
-                //Obtengo los mensajes de MongoDB y se los paso al cliente: 
-                const messages = await MessageModel.find();
-                io.sockets.emit("message", messages);
-            })
-
-            socket.emit("products", await productRepository.getProducts());
-
-            // Agregar nuevo producto
-            socket.on("addProduct", async (product) => {
-                await productRepository.addProduct(product);
-                io.sockets.emit("products", await productRepository.getProducts());
-            });
-
-            // Eliminar producto
-            socket.on("deleteProduct", async (id) => {
-                await productRepository.deleteProduct(id);
-                io.sockets.emit("products", await productRepository.getProducts());
-            });
-
-        })
+        const SocketManager = require("../sockets/socketmanager.js");
+        new SocketManager(httpServer);
     }
 }
 

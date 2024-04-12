@@ -1,10 +1,55 @@
-<h1>{{title}}</h1>
+<h1>Bienvenid@ {{first_name}} {{last_name}} </h1>
+<h4>Rol: {{role}}</h4>
 
-<table id="productsContainer">
-    <thead id="productsHeader"></thead>
-    <tbody id="productsBody"></tbody>
-</table>
+<form action="/api/users/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
+
 <br>
+<h2>{{title}}</h2>
+<div>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>En Stock</th>
+        <th>Precio</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      {{#each products}}
+        <tr>
+          <td>{{this.code}}</td>
+          <td>{{this.title}}</td>
+          <td>{{this.description}}</td>
+          <td>{{this.stock}}</td>
+          <td>{{this.price}}</td>          
+          <td>                       
+            <button class="btnDeleteProduct" onclick="deleteProduct('{{this._id}}')">Eliminar</button>
+          </form>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{#if hasPrevPage}}
+    <a href="/realtimeproducts?page={{prevPage}}&limit={{limit}}"> Anterior </a>
+  {{/if}}
+  {{#if hasNextPage}}
+    <a href="/realtimeproducts?page={{nextPage}}&limit={{limit}}"> Siguiente </a>
+  {{/if}}
+  <p>Pagina {{page}} de {{totalPages}} </p>
+
+  <script>
+    
+
+  </script>
+</div>
+
+
 
 <h2>Agregar Nuevo Producto</h2>
 <form>
@@ -19,7 +64,8 @@
         <option value="true">Activo</option>
         <option value="false">Inactivo</option>
     </select>
-    <button type="button" id="btnSend">Enviar</button>
+    <button class="btnAddProduct" onclick="addProduct()" >Agregar Producto</button>
+    
 </form>
 
 
