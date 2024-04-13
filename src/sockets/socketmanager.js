@@ -19,7 +19,7 @@ class SocketManager {
 
                 //Obtengo los mensajes de MongoDB y se los paso al cliente: 
                 const messages = await MessageModel.find();
-                io.sockets.emit("message", messages);
+                this.io.sockets.emit("message", messages);
             })
 
             // Agregar nuevo producto

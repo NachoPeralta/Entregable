@@ -70,11 +70,10 @@ class ViewsController {
             let totalBuy = 0;
 
             const cartProducts = cart.products.map(item => {
-                const product = item.product.toObject();
+                const product = item.product ? item.product.toObject() : null;
                 const quantity = item.quantity;
-                const totalPrice = product.price * quantity;
-
-
+                const totalPrice =( product ? product.price : 0 ) * quantity;
+                
                 totalBuy += totalPrice;
 
                 return {

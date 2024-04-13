@@ -21,9 +21,9 @@ class CartRepository {
         return cart;
     }
 
-    async addProductToCart(cid, pid, quantity) {        
-        const cart = dbCartManager.addProductToCart(cid, pid, quantity);
-        return cart;
+    async addProductToCart(cart, product, quantity) {        
+        const cartAdded = dbCartManager.addProductToCart(cart, product, quantity);
+        return cartAdded;
     }
 
     async emptyCart(cid) {

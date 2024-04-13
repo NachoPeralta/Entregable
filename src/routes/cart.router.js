@@ -3,9 +3,8 @@ const router = express.Router();
 
 const CartController = require("../controller/cartController.js");
 const cartController = new CartController();
-const ProductController = require("../controller/productController.js");
-const productController = new ProductController();
 
+const passport = require('passport');
 
 
 // Devuelve todos los carritos
@@ -31,6 +30,8 @@ router.put('/:cid', cartController.updateCartProducts);
 
 // Actualiza cantidades de productos en el carrito. Si el producto no existe en el mismo lo agrega.
 router.put('/:cid/product/:pid', cartController.updateProductQuantity);
+
+router.post('/:cid/purchase', passport.authenticate('jwt', { session: false }), cartController.endPurchase);
 
 
 module.exports = router;

@@ -42,21 +42,27 @@ class CartManager {
         }
     }
 
-    async addProductToCart(cartId, productId, quantity = 1) {
+    async addProductToCart(cart, product, quantity) {
         try {
-            const cart = await this.getCartById(cartId);
+            console.log("*** CART MANAGER");
+            
             if (!cart) {
                 console.log("Carrito no encontrado");
                 return null;
             }
             
-            const productExist = cart.products.find(product => product.product.id == productId.id);
-           
+            const productExist = cart.products.find(prod => prod.product.id == product.id);
+            // Cambio el tipo de dato de la cantidad a entero para que no se agregue como texto
+            quantity = parseInt(quantity);
+
             if (productExist) {
+                console.log("***Producto ya existe en el carrito agrego solo la cantidad de:" + quantity);
+
                 productExist.quantity += quantity;
             } else {
+                console.log("***Producto no existe en el carrito agrego el producto con la cantidad de:" + quantity);
                 cart.products.push({
-                    product: productId,
+                    product: product,
                     quantity: quantity
                 });
             }
