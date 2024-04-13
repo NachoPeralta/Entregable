@@ -16,7 +16,7 @@ const generateUniqueCode = () => {
 // Función para calcular el total de la compra
 const calcTotal = (products) => {
     let total = 0;
-    console.log("*** CALC TOTAL");
+    
     products.forEach(item => {
         total += item.product.price * item.quantity;
     });

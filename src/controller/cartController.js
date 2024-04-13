@@ -70,9 +70,7 @@ class CartController {
             }
 
             const quantity = req.body.quantity || 1;
-            console.log("*** CART CONTROLLER");
-            console.log("*** req.body.quantity:" + req.body.quantity);
-
+            
             cart = await cartRepository.addProductToCart(cart, product, quantity);
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "No se pudo agregar el producto al carrito" });

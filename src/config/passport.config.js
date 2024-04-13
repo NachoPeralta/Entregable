@@ -61,7 +61,6 @@ const initializePassport = () => {
 
             return done(null, user); // Devuelve el usuario encontrado
         } catch (error) {
-            console.log("*** error:" + error);            
             return done(error);
         }
     }));

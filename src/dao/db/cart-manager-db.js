@@ -3,7 +3,7 @@ const CartModel = require("../../models/cart.model.js");
 class CartManager {
     async createCart() {
         try {
-            const newCart = CartModel({products: []});
+            const newCart = CartModel({ products: [] });
             await newCart.save();
             return newCart;
         } catch (error) {
@@ -26,7 +26,7 @@ class CartManager {
 
     async updateCartProducts(id, products) {
         try {
-            const cart = await CartModel.findByIdAndUpdate(id, {products: products}, {new: true});
+            const cart = await CartModel.findByIdAndUpdate(id, { products: products }, { new: true });
             return cart;
         } catch (error) {
             console.log("Error al actualizar el carrito", error);
@@ -44,23 +44,19 @@ class CartManager {
 
     async addProductToCart(cart, product, quantity) {
         try {
-            console.log("*** CART MANAGER");
-            
+
             if (!cart) {
                 console.log("Carrito no encontrado");
                 return null;
             }
-            
+
             const productExist = cart.products.find(prod => prod.product.id == product.id);
             // Cambio el tipo de dato de la cantidad a entero para que no se agregue como texto
             quantity = parseInt(quantity);
 
             if (productExist) {
-                console.log("***Producto ya existe en el carrito agrego solo la cantidad de:" + quantity);
-
                 productExist.quantity += quantity;
             } else {
-                console.log("***Producto no existe en el carrito agrego el producto con la cantidad de:" + quantity);
                 cart.products.push({
                     product: product,
                     quantity: quantity
@@ -72,7 +68,7 @@ class CartManager {
             return cart;
 
         } catch (error) {
-            console.log("Error al agregar producto al carrito",error);
+            console.log("Error al agregar producto al carrito", error);
         }
     }
 

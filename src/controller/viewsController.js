@@ -102,10 +102,8 @@ class ViewsController {
     async renderRealTimeProducts(req, res) {
         try {
 
-            console.log("*** REAL TIME PRODS");
             console.log(parseInt(req.query.page));
-            console.log("*** USER:" + req.user);
-
+           
             let limit = parseInt(req.query.limit) || 10;
             let page = parseInt(req.query.page) || 1;
             let sort = req.query.sort || "asc";
