@@ -20,8 +20,7 @@ const calcTotal = (products) => {
     products.forEach(item => {
         total += item.product.price * item.quantity;
     });
-    console.log("TOTAL: " + total);
-
+    
     return total;
 }
 

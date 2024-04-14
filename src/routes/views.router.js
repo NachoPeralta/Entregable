@@ -14,5 +14,7 @@ router.get("/register", viewsController.renderRegister);
 router.get("/realtimeproducts", checkUserRole(['admin']), passport.authenticate('jwt', { session: false }), viewsController.renderRealTimeProducts);
 router.get("/chat", checkUserRole(['user']), viewsController.renderChat);
 router.get("/", viewsController.renderLogin);
+router.get("/endPurchase/:cid/ticket/:tid", viewsController.renderPurchase);
+
 
 module.exports = router;

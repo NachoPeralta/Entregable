@@ -6,7 +6,7 @@ const ticketSchema = mongoose.Schema({
         required: true,
         unique: true
     },
-    purchace_datetime: {
+    purchase_datetime: {
         type: Date,
         default: Date.now,
         required: true
@@ -15,7 +15,7 @@ const ticketSchema = mongoose.Schema({
         type: Number,
         required: true,
     },
-    purchase: {
+    purchaser: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
         required: true

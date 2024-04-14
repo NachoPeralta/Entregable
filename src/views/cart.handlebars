@@ -37,9 +37,19 @@
   <button onclick="endPurchase('{{cartId}}')">Terminar Compra</button>
   <br>
 </div>
+<br>
+{{#if hasTicket}}
+    <h2>Ticket de Compra</h2>
+    <h4>Comprador:</h4>
+    <p>{{purchaser.first_name}} {{purchaser.last_name}}</p>
+    <p>{{purchaser.email}}</p>
+    <h4>Código: {{ticket.code}}</h4>
+    <h4>Fecha Emisión: {{ticket.purchase_datetime}}</h4>
+    <h4>Total Compra: {{ticket.amount}}</h4>
+{{/if}}
 <br />
+<br>
 <a href="/products">Tienda</a>
-<br />
 <br />
 <a href="/chat">Chat en vivo</a>
 <br />
@@ -74,7 +84,7 @@
                 console.error('Error:', error);
             });
     }
-    function endPurchase(cartId) {
+    /*function endPurchase(cartId) {
         fetch(`/api/carts/${cartId}/purchase`, {
             method: 'POST'
         })
@@ -87,5 +97,28 @@
             .catch(error => {
                 console.error('Error:', error);
             });
-    }
+    }*/
+
+    function endPurchase(cartId) {
+    fetch(`/api/carts/${cartId}/purchase`, {
+        method: 'POST'
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al finalizar la compra');
+            }
+            // Obtener el ID del ticket de la respuesta
+            return response.json();
+        })
+        .then(data => {
+            const ticketId = data.ticketId;
+            const cartId = data.cartId;
+            // Redirijo a la página actual pero con detalles del ticket
+            window.location.href = `/endPurchase/${cartId}/ticket/${ticketId}`;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
 </script>

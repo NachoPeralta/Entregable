@@ -67,7 +67,7 @@ class ProductController {
         try {
             const product = req.body;
 
-            console.log("Producto Nuevo:" + product);
+            //console.log("Producto Nuevo:" + product);
 
             const newProduct = await productRepository.addProduct(product);
             if (!newProduct) {

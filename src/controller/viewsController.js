@@ -1,8 +1,10 @@
-const ProductModel = require("../models/products.model.js");
 const CartRepository = require("../repositories/cart.repository.js");
 const cartRepository = new CartRepository();
 const ProductRepository = require("../repositories/product.repository.js");
 const productRepository = new ProductRepository();
+const TicketRepository = require("../repositories/ticket.repository.js");
+const ticketRepository = new TicketRepository();
+const UserModel = require("../models/user.model.js");
 
 class ViewsController {
     async renderProducts(req, res) {
@@ -83,7 +85,13 @@ class ViewsController {
                 };
             });
 
-            res.render("cart", { products: cartProducts, totalBuy, cartId, title, cartInfo });
+            res.render("cart", { 
+                products: cartProducts, 
+                totalBuy, 
+                cartId, 
+                title, 
+                cartInfo,
+                hasTicket: false });
 
         } catch (error) {
             console.error("Error al obtener el carrito", error);
@@ -101,9 +109,6 @@ class ViewsController {
 
     async renderRealTimeProducts(req, res) {
         try {
-
-            console.log(parseInt(req.query.page));
-           
             let limit = parseInt(req.query.limit) || 10;
             let page = parseInt(req.query.page) || 1;
             let sort = req.query.sort || "asc";
@@ -153,6 +158,39 @@ class ViewsController {
     async renderHome(req, res) {
         res.render("home");
     }
+
+    async renderPurchase(req, res) {
+        try {
+            console.log("*** RENDER PURCHASE");
+            console.log("** req.params.cid:"+ req.params.cid);
+            console.log("** req.params.tid:"+ req.params.tid);
+            const cart = await cartRepository.getCartById(req.params.cid);
+            const ticket = await ticketRepository.getTicketById(req.params.tid);
+            const purchaser = await UserModel.findById(ticket.purchaser);
+            const products = cart.products;
+            const cartInfo = "Productos pendientes de compra. Momentaneamente sin stock";
+            const title = "Compra Finalizada";
+            const hasTicket = true;
+    
+            res.render("cart", {
+                products,
+                cart,
+                ticket,
+                title,
+                cartInfo,
+                purchaser,
+                hasTicket
+            });
+
+        } catch (error) {
+            console.error("Error al renderizar finalizar compra:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
+    }
+    
+      
+    
+    
 }
 
 module.exports = ViewsController;

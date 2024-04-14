@@ -212,7 +212,7 @@ class CartController {
                 code: generateUniqueCode(),
                 purchase_datetime: new Date(),
                 amount: calcTotal(cart.products),
-                purchase: userWithCart._id
+                purchaser: userWithCart._id
             });
             
             await ticket.save();
@@ -223,7 +223,8 @@ class CartController {
             // Guardar el carrito actualizado en la base de datos
             await cart.save();
 
-            res.status(200).json({ notAvailableProd });
+            res.status(200).json({ cartId: cart._id, ticketId: ticket._id });
+
 
         } catch (error) {
             console.error('Error al procesar la compra:', error);
