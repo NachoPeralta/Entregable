@@ -1,6 +1,6 @@
 const ProductManager = require("../dao/db/product-manager-db.js");
 const dbProductManager = new ProductManager();
-
+const { faker } = require("@faker-js/faker");
 
 class ProductRepository {
 
@@ -28,6 +28,18 @@ class ProductRepository {
     async deleteProduct(id) {
         const deletedProduct = await dbProductManager.deleteProduct(id);
         return deletedProduct;
+    }
+
+    async generateProduct() {
+        return {
+            id: faker.database.mongodbObjectId(),
+            title: faker.commerce.productName(),
+            price: faker.commerce.price(),
+            code: faker.commerce.isbn(),
+            stock: parseInt(faker.string.numeric()),
+            description: faker.commerce.productDescription(),
+            image: faker.image.url()
+        }
     }
 
 }

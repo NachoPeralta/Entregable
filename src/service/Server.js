@@ -11,6 +11,7 @@ const productsRouter = require("../routes/products.router");
 const cartRouter = require("../routes/cart.router.js");
 const userRouter = require("../routes/user.router.js");
 const viewsRouter = require("../routes/views.router.js");
+const mockingRouter = require("../routes/mocking.router.js");
 
 //Conexión
 const socket = require("socket.io");
@@ -69,7 +70,8 @@ class Server {
         this.app.use("/api/users", userRouter);
         this.app.use("/api/products", productsRouter);
         this.app.use("/api/carts", cartRouter);
-        this.app.use("/", viewsRouter);
+        this.app.use("/", viewsRouter);        
+        this.app.use("/", mockingRouter);
 
         const httpServer = this.app.listen(this.port, () => {
             console.log(`Servidor escuchando en el puerto ${this.port}`);

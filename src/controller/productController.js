@@ -20,7 +20,7 @@ class ProductController {
             }
 
             const result = products.docs.map(product => {
-                const {...rest } = product;
+                const { ...rest } = product;
                 return rest;
             });
 
@@ -111,6 +111,25 @@ class ProductController {
             res.status(200).send({ status: "Success", deletedProduct: deletedProduct });
         } catch (error) {
             res.status(401).send({ status: "Error", error: "No se pudo eliminar el producto" });
+            console.log(error);
+            return;
+        }
+    }
+
+    async generateProducts(req, res) {
+        try {
+            console.log("*** Generando productos");
+            let products = [];
+
+            for (let i = 0; i < 100; i++) {
+                let p = await productRepository.generateProduct()                
+                products.push(p);
+            }
+
+            res.status(200).send({ status: "Success", products: products });
+
+        } catch (error) {
+            res.status(401).send({ status: "Error", error: "No se pudo generar los productos" });
             console.log(error);
             return;
         }
