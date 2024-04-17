@@ -1,15 +1,28 @@
-const { EErrors } = require("../service/errors/enums.js");
+const { Errors } = require("../service/errors/enums.js");
 
-const manejadorError = (error, req, res, next) => {
-    console.log(error.causa);
-    console.log("Hola, hay alguien con vida aca? ");
+const errorHandler = (error, req, res, next) => {
+    console.log(error.cause);
+
     switch (error.code) {
-        case EErrors.TIPO_INVALIDO:
-            res.send({ status: "error", error: error.nombre })
+        case Errors.PATH_ERROR:
+            res.send({ status: "error", error: error.name })
+            break;
+        case Errors.INVALID_TYPE:
+            res.send({ status: "error", error: error.name })
+            break;
+        case Errors.BD_ERROR:
+            res.send({ status: "error", error: error.name })
+            break;
+        case Errors.INVALID_CREDENCIALS:
+            res.send({ status: "error", error: error.name })
+            break;
+        case Errors.EMAIL_EXISTS:
+            res.send({ status: "error", error: error.name })
             break;
         default:
             res.send({ status: "error", error: "Error desconocido" })
     }
 }
 
-module.exports = manejadorError;
+
+module.exports = errorHandler;

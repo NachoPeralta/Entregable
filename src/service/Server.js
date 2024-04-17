@@ -23,6 +23,7 @@ const path = require("path");
 const cors = require("cors");
 const confiObj = require("../config/config.js");
 const env = confiObj;
+const errorHandler = require("../utils/errorHandler.js");
 
 class Server {
     // Se crea una instancia de express para crear el servidor.
@@ -39,6 +40,7 @@ class Server {
         this.app.use(express.json());
         this.app.use(cookieParser());
         this.app.use(cors());
+        this.app.use(errorHandler);
 
         const hbs = create({
             runtimeOptions: {
@@ -52,7 +54,7 @@ class Server {
             resave: true,
             saveUninitialized: true,
             store: MongoStore.create({
-                mongoUrl: "mongodb+srv://wiperalta:wiperalta@cluster0.ws0uxkf.mongodb.net/ecommerce?retryWrites=true&w=majority", ttl: 100
+                mongoUrl: "mongodb+srv://wiperalta:wiperalta@cluster0.ws0uxkf.mongodb.net/ecommerce?retryWrites=true&w=majority", ttl: 3600
             })
         }))
 

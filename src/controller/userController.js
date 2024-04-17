@@ -3,14 +3,22 @@ const CartModel = require("../models/cart.model.js");
 const { generateToken } = require("../utils/jsonwebtoken.js");
 const { createHash, isValidPassword } = require("../utils/hashBcrypt.js");
 const UserDTO = require("../dto/user.dto.js");
+const CustomError = require("../service/errors/custom.error.js");
+const { infoRegister, infoCredencials } = require("../service/errors/info.js");
+const { Errors } = require("../service/errors/enums.js");
 
 class UserController {
-    async register(req, res) {
+    async register(req, res, next) {
         const { first_name, last_name, email, password, age } = req.body;
         try {
             const userExist = await UserModel.findOne({ email });
             if (userExist) {
-                return res.status(400).send("El usuario ya existe");
+                CustomError.createError({
+                    name: "Registro de Usuario",
+                    cause: infoRegister(email),
+                    message: "Correo electronico existente",
+                    code: Errors.EMAIL_EXISTS
+                });
             }
 
             //Creo un nuevo carrito y lo asigno al usuario 
@@ -38,11 +46,12 @@ class UserController {
 
         } catch (error) {
             console.error(error);
-            res.status(500).send("Error interno del servidor");
+            next(error);
+            // res.status(500).send("Error interno del servidor");
         }
     }
 
-    async login(req, res) {
+    async login(req, res, next) {
         const { email, password } = req.body;
         try {
             const userExist = await UserModel.findOne({ email });
@@ -57,10 +66,16 @@ class UserController {
             const isValid = isValidPassword(password, userExist);
 
             if (!isValid) {
-                req.error = "Error de credenciales";
-                req.message = "vuelva a intentar";
+                CustomError.createError({
+                    name: "Login de Usuario",
+                    cause: infoCredencials(),
+                    message: "Erorr de credenciales",
+                    code: Errors.INVALID_CREDENCIALS
+                });
+                // req.error = "Error de credenciales";
+                // req.message = "vuelva a intentar";
 
-                return res.status(401).redirect("/api/users/faillogin");
+                // return res.status(401).redirect("/api/users/faillogin");
             }
 
             const token = generateToken({ user: userExist });
@@ -73,7 +88,9 @@ class UserController {
 
         } catch (error) {
             console.error(error);
-            res.status(500).send("Error interno del servidor");
+            next(error);
+            //res.status(500).send("Error interno del servidor");
+
         }
     }
 
