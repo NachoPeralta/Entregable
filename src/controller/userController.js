@@ -9,11 +9,12 @@ const { Errors } = require("../service/errors/enums.js");
 
 class UserController {
     async register(req, res, next) {
+        console.log("***BODY" + req.body)
         const { first_name, last_name, email, password, age } = req.body;
         try {
             const userExist = await UserModel.findOne({ email });
             if (userExist) {
-                CustomError.createError({
+                throw CustomError.createError({
                     name: "Registro de Usuario",
                     cause: infoRegister(email),
                     message: "Correo electronico existente",
@@ -45,7 +46,7 @@ class UserController {
             res.redirect("/api/users/profile");
 
         } catch (error) {
-            console.error(error);
+            console.error("***EN EL CATCH, Error:"+error);
             next(error);
             // res.status(500).send("Error interno del servidor");
         }
@@ -66,7 +67,7 @@ class UserController {
             const isValid = isValidPassword(password, userExist);
 
             if (!isValid) {
-                CustomError.createError({
+                throw CustomError.createError({
                     name: "Login de Usuario",
                     cause: infoCredencials(),
                     message: "Erorr de credenciales",

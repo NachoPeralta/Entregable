@@ -1,5 +1,5 @@
 const infoRegister = (email) => {
-    return ` El email ${email} ya se encuentra registrado en el sistema.
+    return `El email ${email} ya se encuentra registrado en el sistema.
     Verifique su email y vuelva a intentarlo. De lo contrario ingrese al login.`
 }
 const infoCredencials = () => {
@@ -7,7 +7,7 @@ const infoCredencials = () => {
 }
 
 const infoProductNotFound = () => {
-    return "El producto no existe"
+    return "El producto que esta buscando no existe"
 }
 
 module.exports = {

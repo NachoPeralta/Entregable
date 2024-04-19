@@ -4,9 +4,8 @@ class CustomError {
         const error = new Error(message);
         error.name = name;
         error.cause = cause;
-        error.code = code;
-        
-        throw error;
+        error.code = code;        
+        return error;
     }
 }
 

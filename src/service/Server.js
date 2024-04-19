@@ -54,7 +54,7 @@ class Server {
             resave: true,
             saveUninitialized: true,
             store: MongoStore.create({
-                mongoUrl: "mongodb+srv://wiperalta:wiperalta@cluster0.ws0uxkf.mongodb.net/ecommerce?retryWrites=true&w=majority", ttl: 3600
+                mongoUrl: env.mongoUrl, ttl: 3600
             })
         }))
 
