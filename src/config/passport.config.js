@@ -55,7 +55,7 @@ const initializePassport = () => {
         try {
             // Busca el usuario en la base de datos usando el ID del payload JWT
             const user = await UserModel.findById(jwt_payload.user._id);
-            if (!user) {                
+            if (!user) {
                 return done(null, false);
             }
 
@@ -81,9 +81,6 @@ const initializePassport = () => {
         callbackURL: "http://localhost:8080/api/users/githubcallback"
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            console.log("GITHUB LOGIN Email:" + profile._json.email);
-
-            
             let user = await UserModel.findOne({ email: profile._json.email });
             if (!user) {
                 let newUser = {
@@ -95,7 +92,7 @@ const initializePassport = () => {
                 }
                 let result = await UserModel.create(newUser);
                 done(null, result);
-            } else {
+            } else {                
                 done(null, user);
             }
 
