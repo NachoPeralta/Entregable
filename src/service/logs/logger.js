@@ -34,7 +34,7 @@ const loggerProd = winston.createLogger({
         }),
         new winston.transports.File({
             filename: "./ecommerceLogs.log", 
-            level: "warning",
+            level: "error",
             format: winston.format.simple()
         })
     ]
@@ -51,7 +51,7 @@ const loggerDev = winston.createLogger({
         }),
         new winston.transports.File({
             filename: "./ecommerceLogs.log", 
-            level: "warning",
+            level: "error",
             format: winston.format.simple()
         })
     ]
