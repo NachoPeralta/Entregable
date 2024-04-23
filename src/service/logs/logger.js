@@ -1,4 +1,7 @@
 const winston = require("winston");
+const confiObj = require("../../config/config.js");
+const env = confiObj;
+
 
 const levels = {
     level: {
@@ -54,18 +57,14 @@ const loggerDev = winston.createLogger({
     ]
 })
 
+const logger = env.mode === "prod" ? loggerProd : loggerDev;
 
 //Middleware: 
 
-const addLoggerProd = (req, res, next) => {
-    req.logger = loggerProd;
-    req.logger.http(`${req.method} en ${req.url} - ${new Date().toLocaleDateString()}`);
-    next();
-}
-const addLoggerDev = (req, res, next) => {
-    req.logger = loggerDev;
+const addLogger = (req, res, next) => {
+    req.logger = logger;
     req.logger.http(`${req.method} en ${req.url} - ${new Date().toLocaleDateString()}`);
     next();
 }
 
-module.exports = {addLoggerProd, addLoggerDev};
+module.exports = addLogger;

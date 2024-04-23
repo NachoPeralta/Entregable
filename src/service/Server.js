@@ -24,7 +24,8 @@ const cors = require("cors");
 const confiObj = require("../config/config.js");
 const env = confiObj;
 const errorHandler = require("../utils/errorHandler.js");
-const {addLoggerProd, addLoggerDev} = require("../service/logs/logger.js");
+//Logger
+const addLogger = require("../service/logs/logger.js");
 
 class Server {
     // Se crea una instancia de express para crear el servidor.
@@ -42,11 +43,8 @@ class Server {
         this.app.use(cookieParser());
         this.app.use(cors());
         this.app.use(errorHandler);
-        if(env.mode === "prod"){
-            this.app.use(addLoggerProd);
-        }else{
-            this.app.use(addLoggerDev);
-        }
+        this.app.use(addLogger);
+        
         
 
         const hbs = create({
@@ -90,7 +88,7 @@ class Server {
             req.logger.info("Mensaje de Info");
             req.logger.warning("Mensaje de Warning");
         
-            res.send("Test de logs");
+            res.send("Testing Logger");
         })
 
         const httpServer = this.app.listen(this.port, () => {

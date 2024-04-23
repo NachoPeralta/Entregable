@@ -13,3 +13,9 @@ error:  Erorr de credenciales {"cause":"Las credenciales ingresadas no son corre
 fatal: Mensaje de Error
 error: Mensaje de Error
 warning: Mensaje de Warning
+fatal: Mensaje de Error
+error: Mensaje de Error
+warning: Mensaje de Warning
+fatal: Mensaje de Error
+error: Mensaje de Error
+warning: Mensaje de Warning
