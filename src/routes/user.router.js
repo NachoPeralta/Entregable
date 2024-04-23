@@ -11,6 +11,7 @@ router.get("/profile", passport.authenticate("jwt", { session: false }), userCon
 router.post("/logout", userController.logout.bind(userController));
 router.get("/admin", passport.authenticate("jwt", { session: false }), userController.admin);
 router.get("/faillogin", userController.failLogin);
+router.get("/failregister", userController.failRegister);
 
 router.get("/github", passport.authenticate("github", { scope: ["user:email"] }), async (req, res) => {
     res.send("Login con github");
@@ -25,7 +26,7 @@ router.get("/githubcallback", passport.authenticate("github", { failureRedirect:
     };
 
     req.login = true;
-    
+
     const token = generateToken({ user: req.user });
     res.cookie("coderCookieToken", token, {
         maxAge: 3600000,

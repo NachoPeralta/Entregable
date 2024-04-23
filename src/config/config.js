@@ -11,6 +11,7 @@ const confiObj = {
     mongoUrl: process.env.MONGO_URL,
     secretWord: process.env.SECRET_WORD,
     port: process.env.PORT,
+    mode: process.env.MODE
 }
 
 

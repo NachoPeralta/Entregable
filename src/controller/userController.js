@@ -7,9 +7,9 @@ const CustomError = require("../service/errors/custom.error.js");
 const { infoRegister, infoCredencials } = require("../service/errors/info.js");
 const { Errors } = require("../service/errors/enums.js");
 
+
 class UserController {
     async register(req, res, next) {
-        console.log("***BODY" + req.body)
         const { first_name, last_name, email, password, age } = req.body;
         try {
             const userExist = await UserModel.findOne({ email });
@@ -46,9 +46,8 @@ class UserController {
             res.redirect("/api/users/profile");
 
         } catch (error) {
-            console.error("***EN EL CATCH, Error:"+error);
-            next(error);
-            // res.status(500).send("Error interno del servidor");
+            req.logger.error("Registro de usuario",error); 
+            return res.status(401).redirect("/api/users/failregister");           
         }
     }
 
@@ -73,10 +72,6 @@ class UserController {
                     message: "Erorr de credenciales",
                     code: Errors.INVALID_CREDENCIALS
                 });
-                // req.error = "Error de credenciales";
-                // req.message = "vuelva a intentar";
-
-                // return res.status(401).redirect("/api/users/faillogin");
             }
 
             const token = generateToken({ user: userExist });
@@ -88,10 +83,8 @@ class UserController {
             res.redirect("/api/users/profile");
 
         } catch (error) {
-            console.error(error);
-            next(error);
-            //res.status(500).send("Error interno del servidor");
-
+            req.logger.error("",error);
+            return res.status(401).redirect("/api/users/faillogin");
         }
     }
 
@@ -105,7 +98,6 @@ class UserController {
         res.clearCookie("coderCookieToken");
         req.session.destroy();
         res.redirect("/");
-        //res.redirect("/login");
     }
 
     async admin(req, res) {
@@ -118,6 +110,16 @@ class UserController {
     async failLogin(req, res) {
         const error = req.error != null ? req.error : "Error de ingreso";
         const message = req.message != null ? req.message : "Verifique credenciales o ingrese a Nuevo Registro";
+
+        res.render("error", {
+            error,
+            message
+        });
+    }
+
+    async failRegister(req, res) {
+        const error = req.error != null ? req.error : "Error de registro";
+        const message = req.message != null ? req.message : "Verifique los datos ingresados, es posible que el email ya se encuentre registrado";
 
         res.render("error", {
             error,

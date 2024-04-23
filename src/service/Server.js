@@ -24,6 +24,7 @@ const cors = require("cors");
 const confiObj = require("../config/config.js");
 const env = confiObj;
 const errorHandler = require("../utils/errorHandler.js");
+const {addLoggerProd, addLoggerDev} = require("../service/logs/logger.js");
 
 class Server {
     // Se crea una instancia de express para crear el servidor.
@@ -41,6 +42,12 @@ class Server {
         this.app.use(cookieParser());
         this.app.use(cors());
         this.app.use(errorHandler);
+        if(env.mode === "prod"){
+            this.app.use(addLoggerProd);
+        }else{
+            this.app.use(addLoggerDev);
+        }
+        
 
         const hbs = create({
             runtimeOptions: {
@@ -74,6 +81,17 @@ class Server {
         this.app.use("/api/carts", cartRouter);
         this.app.use("/", viewsRouter);        
         this.app.use("/", mockingRouter);
+        
+        //Logger
+        this.app.get("/loggertest", (req, res) => {
+            req.logger.fatal("Mensaje de Error");
+            req.logger.error("Mensaje de Error");
+            req.logger.debug("Mensaje de Debug");
+            req.logger.info("Mensaje de Info");
+            req.logger.warning("Mensaje de Warning");
+        
+            res.send("Test de logs");
+        })
 
         const httpServer = this.app.listen(this.port, () => {
             console.log(`Servidor escuchando en el puerto ${this.port}`);
