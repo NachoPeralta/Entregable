@@ -48,8 +48,8 @@ class ProductController {
             });
 
         } catch (error) {
-            console.log("Error al traer los productos", error);
-            res.status(401).send({ status: "error", error: "Error al traer los productos" });
+            req.logger.error("Error al traer los productos. ",error);
+            res.status(401).send({ status: "error", error: "Error al traer los productos. " + error });
         }
     }
 
@@ -67,8 +67,6 @@ class ProductController {
         try {
             const product = req.body;
 
-            //console.log("Producto Nuevo:" + product);
-
             const newProduct = await productRepository.addProduct(product);
             if (!newProduct) {
                 res.status(400).send({ status: "Error", error: "No se pudo agregar el producto, verifique los datos ingresados" });
@@ -77,8 +75,8 @@ class ProductController {
             res.status(201).send({ status: "Success", product: { newProduct } });
 
         } catch (error) {
+            req.logger.error("No se pudo agregar el producto. ",error);
             res.status(401).send({ status: "Error", error: "No se pudo agregar el producto" });
-            console.log(error);
             return;
         }
     }
@@ -95,8 +93,8 @@ class ProductController {
             res.status(200).send({ status: "Success", product: { updatedProduct } });
 
         } catch (error) {
+            req.logger.error("No se pudo actualizar el producto. ",error); 
             res.status(401).send({ status: "Error", error: "No se pudo actualizar el producto" });
-            console.log(error);
             return;
         }
     }
@@ -110,15 +108,16 @@ class ProductController {
             }
             res.status(200).send({ status: "Success", deletedProduct: deletedProduct });
         } catch (error) {
+            req.logger.error("No se pudo eliminar el producto. ",error); 
             res.status(401).send({ status: "Error", error: "No se pudo eliminar el producto" });
-            console.log(error);
             return;
         }
     }
 
     async generateProducts(req, res) {
         try {
-            console.log("*** Generando productos");
+            req.logger.info("Generando Productos de prueba... ",info); 
+
             let products = [];
 
             for (let i = 0; i < 100; i++) {
@@ -129,8 +128,8 @@ class ProductController {
             res.status(200).send({ status: "Success", products: products });
 
         } catch (error) {
+            req.logger.error("No se pudo generar los productos. ",error); 
             res.status(401).send({ status: "Error", error: "No se pudo generar los productos" });
-            console.log(error);
             return;
         }
     }

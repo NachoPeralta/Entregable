@@ -17,8 +17,7 @@ class CartController {
             const carts = await cartRepository.getCarts();
             res.status(200).send({ status: "success", cart: carts });
         } catch (error) {
-            console.log(error);
-            res.status(401).send({ status: "error", error: "No se pudieron cargar los carritos" });
+            res.status(401).send({ status: "error", error: "No se pudieron cargar los carritos." + error });
         }
     }
 
@@ -38,8 +37,7 @@ class CartController {
                 res.status(404).send({ status: "Error", error: "Carrito no encontrado" });
             }
         } catch (error) {
-            console.log(error);
-            res.status(401).send({ status: "Error", error: "No se pudo cargar el carrito" });
+            res.status(401).send({ status: "Error", error: "No se pudo cargar el carrito. " + error });
         }
     }
 
@@ -48,8 +46,7 @@ class CartController {
             const cart = await cartRepository.createCart();
             res.status(201).send({ status: "Success", cart: cart });
         } catch (error) {
-            res.status(401).send({ status: "Error", error: "No se pudo crear el carrito" });
-            console.log(error);
+            res.status(401).send({ status: "Error", error: "No se pudo crear el carrito. " + error });
             return;
         }
     }
@@ -77,12 +74,10 @@ class CartController {
                 return;
             }
 
-            //res.status(200).send({ status: "Success", cart: cart });
             res.redirect(`/carts/${cart._id}`);
 
         } catch (error) {
-            res.status(401).send({ status: "Error", error: "No se pudo agregar el producto al carrito" });
-            console.log(error);
+            res.status(401).send({ status: "Error", error: "No se pudo agregar el producto al carrito. " + error });
             return;
         }
     }
@@ -96,8 +91,7 @@ class CartController {
             }
             res.status(200).send({ status: "Success", cart: cart });
         } catch (error) {
-            res.status(401).send({ status: "Error", error: "No se pudo eliminar el carrito" });
-            console.log(error);
+            res.status(401).send({ status: "Error", error: "No se pudo eliminar el carrito. " + error });
             return;
         }
     }
@@ -119,8 +113,7 @@ class CartController {
             res.status(200).send({ status: "Success", cart: cart });
 
         } catch (error) {
-            res.status(401).send({ status: "Error", error: "No se pudo eliminar el producto del carrito" });
-            console.log(error);
+            res.status(401).send({ status: "Error", error: "No se pudo eliminar el producto del carrito. " + error });
             return;
         }
     }
@@ -227,8 +220,7 @@ class CartController {
 
 
         } catch (error) {
-            console.error('Error al procesar la compra:', error);
-            res.status(500).json({ error: 'Error interno del servidor' });
+            res.status(500).json({ error: 'Error interno del servidor al procesar la compra. ' + error });
         }
     }
 

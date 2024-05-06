@@ -60,6 +60,7 @@ class UserController {
                 req.error = "Usuario no encontrado";
                 req.message = "vuelva a intentar";
 
+                req.logger.info(req.error); 
                 return res.status(401).redirect("/api/users/faillogin");
             }
 
@@ -83,7 +84,7 @@ class UserController {
             res.redirect("/api/users/profile");
 
         } catch (error) {
-            req.logger.error("",error);
+            req.logger.error("Error de ingreso.",error);
             return res.status(401).redirect("/api/users/faillogin");
         }
     }
@@ -111,6 +112,8 @@ class UserController {
         const error = req.error != null ? req.error : "Error de ingreso";
         const message = req.message != null ? req.message : "Verifique credenciales o ingrese a Nuevo Registro";
 
+        req.logger.info(error, message);
+
         res.render("error", {
             error,
             message
@@ -121,6 +124,8 @@ class UserController {
         const error = req.error != null ? req.error : "Error de registro";
         const message = req.message != null ? req.message : "Verifique los datos ingresados, es posible que el email ya se encuentre registrado";
 
+        req.logger.info(error, message);
+        
         res.render("error", {
             error,
             message
