@@ -59,12 +59,4 @@ const loggerDev = winston.createLogger({
 
 const logger = env.mode === "prod" ? loggerProd : loggerDev;
 
-//Middleware: 
-
-const addLogger = (req, res, next) => {
-    req.logger = logger;
-    req.logger.http(`${req.method} en ${req.url} - ${new Date().toLocaleDateString()}`);
-    next();
-}
-
-module.exports = addLogger;
+module.exports = logger;

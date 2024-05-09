@@ -5,6 +5,7 @@ const productRepository = new ProductRepository();
 const TicketRepository = require("../repositories/ticket.repository.js");
 const ticketRepository = new TicketRepository();
 const UserModel = require("../models/user.model.js");
+const logger = require("../service/logs/logger.js");
 
 class ViewsController {
     async renderProducts(req, res) {
@@ -18,7 +19,7 @@ class ViewsController {
             const products = await productRepository.getProducts(limit, page, category, sort);
 
             if (!products) {
-                req.logger.info("No se encontraron productos",info);
+                logger.info("No se encontraron productos",info);
                 res.status(404).send({ status: "error", error: "No se encontraron productos" });
                 return;
             }
@@ -53,7 +54,7 @@ class ViewsController {
             });
 
         } catch (error) {
-            req.logger.error("Error al traer los productos",error); 
+            logger.error("Error al traer los productos",error); 
             res.status(401).send({ status: "error", error: "Error al traer los productos" });
         }
     }
@@ -67,7 +68,7 @@ class ViewsController {
             const cart = await cartRepository.getCartById(cartId);
 
             if (!cart) {
-                req.logger.info("Carrito no encontrado.",info);
+                logger.info("Carrito no encontrado.",info);
                 return res.status(404).json({ error: "Carrito no encontrado" });
             }
 
@@ -96,7 +97,7 @@ class ViewsController {
                 hasTicket: false });
 
         } catch (error) {
-            req.logger.error("Error del servidor al obtener el carrito",error); 
+            logger.error("Error del servidor al obtener el carrito",error); 
             res.status(500).json({ error: "Error interno del servidor" });
         }
     }
@@ -147,7 +148,7 @@ class ViewsController {
             });
     
         } catch (error) {            
-            req.logger.error("Error en la vista de productos en tiempo real. ",error); 
+            logger.error("Error en la vista de productos en tiempo real. ",error); 
             res.status(500).json({ error: "Error interno del servidor" });
         }
     }
@@ -182,7 +183,7 @@ class ViewsController {
             });
 
         } catch (error) {
-            req.logger.error("Error al renderizar finalizar compra. ",error); 
+            logger.error("Error al renderizar finalizar compra. ",error); 
             res.status(500).json({ error: "Error interno del servidor" });
         }
     }

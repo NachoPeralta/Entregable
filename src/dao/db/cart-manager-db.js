@@ -1,4 +1,5 @@
 const CartModel = require("../../models/cart.model.js");
+const logger = require("../service/logs/logger.js");
 
 class CartManager {
     async createCart() {
@@ -7,7 +8,7 @@ class CartManager {
             await newCart.save();
             return newCart;
         } catch (error) {
-            req.logger.error("Error al crear carrito. ",error);
+            logger.error("Error al crear carrito. ",error);
         }
     }
 
@@ -15,12 +16,12 @@ class CartManager {
         try {
             const cart = await CartModel.findById(id);
             if (!cart) {
-                req.logger.warning("Carrito no encontrado.");
+                logger.warning("Carrito no encontrado.");
                 return null;
             }
             return cart;
         } catch (error) {
-            req.logger.error("Error al traer el carrito. ",error); 
+            logger.error("Error al traer el carrito. ",error); 
         }
     }
 
@@ -29,7 +30,7 @@ class CartManager {
             const cart = await CartModel.findByIdAndUpdate(id, { products: products }, { new: true });
             return cart;
         } catch (error) {
-            req.logger.error("Error al actualizar el carrito. ",error); 
+            logger.error("Error al actualizar el carrito. ",error); 
         }
     }
 
@@ -38,7 +39,7 @@ class CartManager {
             const deletedCart = await CartModel.findByIdAndDelete(id);
             return deletedCart;
         } catch (error) {
-            req.logger.error("Error al eliminar el carrito. ", error);
+            logger.error("Error al eliminar el carrito. ", error);
         }
     }
 
@@ -46,7 +47,7 @@ class CartManager {
         try {
 
             if (!cart) {
-                req.logger.info("Carrito no encontrado"); 
+                logger.info("Carrito no encontrado"); 
                 return null;
             }
 
@@ -68,7 +69,7 @@ class CartManager {
             return cart;
 
         } catch (error) {
-            req.logger.error("Error al agregar producto al carrito. ", error);
+            logger.error("Error al agregar producto al carrito. ", error);
             return null;
         }
     }
@@ -78,7 +79,7 @@ class CartManager {
             const carts = await CartModel.find();
             return carts;
         } catch (error) {
-            req.logger.error("Error al traer los carritos. ", error);
+            logger.error("Error al traer los carritos. ", error);
             return null;
         }
     }
@@ -87,13 +88,13 @@ class CartManager {
         try {
             const cart = await this.getCartById(cartId);
             if (!cart) {
-                req.logger.info("Carrito no encontrado");
+                logger.info("Carrito no encontrado");
                 return null;
             }
 
             const productIndex = cart.products.findIndex(product => product.product._id.toString() === productId);
             if (productIndex === -1) {
-                req.logger.info("Producto no encontrado en el carrito");
+                logger.info("Producto no encontrado en el carrito");
                 return null;
             }
 
@@ -102,7 +103,7 @@ class CartManager {
             await cart.save();
             return cart;
         } catch (error) {
-            req.logger.error("Error al eliminar producto del carrito. ", error);
+            logger.error("Error al eliminar producto del carrito. ", error);
             return null;
         }
     }
@@ -111,7 +112,7 @@ class CartManager {
         try {
             const cart = await this.getCartById(cartId);
             if (!cart) {
-                req.logger.info("Carrito no encontrado");
+                logger.info("Carrito no encontrado");
                 return null;
             }
 
@@ -120,7 +121,7 @@ class CartManager {
             await cart.save();
             return cart;
         } catch (error) {
-            req.logger.error("Error al vaciar el carrito. ", error);
+            logger.error("Error al vaciar el carrito. ", error);
             return null;
         }
     }
