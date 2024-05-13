@@ -1,5 +1,5 @@
 const CartModel = require("../../models/cart.model.js");
-const logger = require("../service/logs/logger.js");
+const logger = require("../../service/logs/logger.js");
 
 class CartManager {
     async createCart() {

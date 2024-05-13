@@ -7,6 +7,7 @@ class ProductController {
 
     async getProducts(req, res) {
         try {
+            
             let limit = parseInt(req.query.limit) || 10;
             let page = parseInt(req.query.page) || 1;
             let category = req.query.category || "";

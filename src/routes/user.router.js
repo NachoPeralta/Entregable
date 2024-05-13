@@ -7,11 +7,15 @@ const { generateToken } = require("../utils/jsonwebtoken.js");
 
 router.post("/register", userController.register);
 router.post("/login", userController.login);
-router.get("/profile", passport.authenticate("jwt", { session: false }), userController.profile);
 router.post("/logout", userController.logout.bind(userController));
+router.get("/profile", passport.authenticate("jwt", { session: false }), userController.profile);
 router.get("/admin", passport.authenticate("jwt", { session: false }), userController.admin);
+
 router.get("/faillogin", userController.failLogin);
 router.get("/failregister", userController.failRegister);
+
+router.post("/requestPasswordReset", userController.requestPasswordReset);
+router.post('/reset-password', userController.resetPassword);
 
 router.get("/github", passport.authenticate("github", { scope: ["user:email"] }), async (req, res) => {
     res.send("Login con github");
@@ -35,5 +39,8 @@ router.get("/githubcallback", passport.authenticate("github", { failureRedirect:
 
     userController.profile(req, res);
 });
+
+router.post("/premium/:uid", userController.changeRoleToPremium);
+
 
 module.exports = router;

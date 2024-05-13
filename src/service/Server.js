@@ -25,7 +25,7 @@ const confiObj = require("../config/config.js");
 const env = confiObj;
 const errorHandler = require("../utils/errorHandler.js");
 //Logger
-const addLogger = require("../middleware/logger-middleware.js");
+const logger = require("../service/logs/logger.js");
 
 class Server {
     // Se crea una instancia de express para crear el servidor.
@@ -43,10 +43,7 @@ class Server {
         this.app.use(cookieParser());
         this.app.use(cors());
         this.app.use(errorHandler);
-        this.app.use(addLogger);
         
-        
-
         const hbs = create({
             runtimeOptions: {
                 allowProtoPropertiesByDefault: true,
@@ -92,7 +89,7 @@ class Server {
         })
 
         const httpServer = this.app.listen(this.port, () => {
-            loger.info(`Servidor escuchando en el puerto ${this.port}`);
+            logger.info("Servidor escuchando en el puerto " + this.port);
         });
 
         //Chat y RealTimeProducts

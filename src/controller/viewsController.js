@@ -115,9 +115,10 @@ class ViewsController {
             let limit = parseInt(req.query.limit) || 10;
             let page = parseInt(req.query.page) || 1;
             let sort = req.query.sort || "asc";
-            let title = "Listado de Productos"
-
-            const products = await productRepository.getProducts(limit, page, null, sort);
+            let title = "Listado de Productos";
+            let owner = req.user.role !== "admin" ? req.user.email : null;
+            
+            const products = await productRepository.getProducts(limit, page, null, sort, owner);
 
             if (!products) {
                 res.status(404).send({ status: "error", error: "No se encontraron productos" });
@@ -144,7 +145,8 @@ class ViewsController {
                 title,
                 first_name: req.user ? req.user.first_name : null,
                 last_name: req.user ? req.user.last_name : null,
-                role: req.user ? req.user.role : null,                
+                role: req.user ? req.user.role : null,
+                owner: owner
             });
     
         } catch (error) {            
@@ -153,7 +155,6 @@ class ViewsController {
         }
     }
     
-
     async renderChat(req, res) {
         res.render("chat");
     }
@@ -187,9 +188,18 @@ class ViewsController {
             res.status(500).json({ error: "Error interno del servidor" });
         }
     }
+            
+    async renderResetPassword(req, res) {
+        res.render("resetpassword");
+    }
+
+    async renderChangePassword(req, res) {
+        res.render("changepassword");
+    }
     
-      
-    
+    async renderConfirmationRestore(req, res){
+        res.render("confirmation-restore");
+    }
     
 }
 

@@ -4,9 +4,9 @@ const { faker } = require("@faker-js/faker");
 
 class ProductRepository {
 
-    async getProducts(limit, page, category, sort) {
+    async getProducts(limit, page, category, sort, owner) {
 
-        const products = await dbProductManager.getProducts(limit, page, category, sort);
+        const products = await dbProductManager.getProducts(limit, page, category, sort, owner);
         return products;
     }
 

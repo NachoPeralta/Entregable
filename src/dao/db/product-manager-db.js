@@ -1,18 +1,19 @@
 const ProductModel = require("../../models/products.model.js");
+const logger = require("../../service/logs/logger.js");
 
 class ProductManager {
 
     async addProduct(newProduct) {
-        let { title, description, code, price, status, stock, category, thumbnail } = newProduct;
+        let { title, description, code, price, status, stock, category, thumbnail, owner } = newProduct;
 
         if (!title || !description || !code || !price || !stock || !category) {
-            console.log("Los datos no pueden estar vacios");
+            logger.warning("Los datos no pueden estar vacios");
             return;
         }
 
         const productExist = await ProductModel.findOne({ code: code });
         if (productExist) {
-            console.log("El codigo de producto ya existe");
+            logger.error("El codigo de producto ya existe");
             return;
         }
 
@@ -24,15 +25,16 @@ class ProductManager {
             status,
             stock,
             category,
-            thumbnail: thumbnail || []
+            thumbnail: thumbnail || [],
+            owner
         })
 
         await product.save();
-        console.log("Producto agregado:", product);
+        logger.info("Producto agregado:", product);
         return product;
     }
 
-    async getProducts(limit = 10, page = 1, category, sort) {
+    async getProducts(limit = 10, page = 1, category, sort, owner) {
     
         try {
 
@@ -43,6 +45,14 @@ class ProductManager {
                 criteria.push({
                     $match: {
                         category: category,
+                    }
+                });
+            }
+            //Filtro por User Owner
+            if (owner) {
+                criteria.push({
+                    $match: {
+                        owner: owner,
                     }
                 });
             }
@@ -92,7 +102,7 @@ class ProductManager {
             };
 
         } catch (error) {
-            console.log("Error al obtener productos:", error);
+            logger.error("Error al obtener productos:", error);
             throw error;
         }
     }
@@ -106,12 +116,12 @@ class ProductManager {
             const product = await ProductModel.findById(id);
 
             if (!product) {
-                console.log("Producto no encontrado");
+                logger.warning("Producto no encontrado");
                 return null;
             }
             return product;
         } catch (error) {
-            console.log("Error al obtener producto:", error);
+            logger.error("Error al obtener producto:", error);
             return error;
         }
     }
@@ -121,14 +131,14 @@ class ProductManager {
             const updatedProduct = await ProductModel.findByIdAndUpdate(id, newData, { new: true });
 
             if (!updatedProduct) {
-                console.log("Producto no encontrado");
+                logger.warning("Producto no encontrado");
                 return null;
             }
-            console.log("Producto actualizado:", updatedProduct);
+            logger.info("Producto actualizado:", updatedProduct);
             return updatedProduct;
 
         } catch (error) {
-            console.log("Error al actualizar producto:", error);
+            logger.error("Error al actualizar producto:", error);
             return null;
         }
     }
@@ -138,14 +148,14 @@ class ProductManager {
             const deletedProduct = await ProductModel.findByIdAndDelete(id);
 
             if (!deletedProduct) {
-                console.log("Producto no encontrado");
+                logger.warning("Producto no encontrado");
                 return null;
             }
-            console.log("Producto eliminado:", deletedProduct);
+            logger.info("Producto eliminado:", deletedProduct);
             return deletedProduct;
 
         } catch (error) {
-            console.log("Error al eliminar producto:", error);
+            logger.error("Error al eliminar producto:", error);
             return null;
         }
     }
