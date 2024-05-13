@@ -17,7 +17,7 @@ router.get("/:cid", cartController.getCartById);
 router.post("/", cartController.createCart);
 
 // Agrega un producto al carrito dado su ID de carrito y producto.
-router.post("/:cid/products/:pid", cartController.addProductToCart);
+router.post("/:cid/products/:pid", passport.authenticate('jwt', { session: false }), cartController.addProductToCart);
 
 // Elimina todos los productos del carrito dado su ID.
 router.delete("/:cid", cartController.emptyCart);

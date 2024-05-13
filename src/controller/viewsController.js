@@ -15,7 +15,7 @@ class ViewsController {
             let category = req.query.category || "";
             let sort = req.query.sort || "asc";
             let title = "Listado de Productos"
-
+            
             const products = await productRepository.getProducts(limit, page, category, sort);
 
             if (!products) {

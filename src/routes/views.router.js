@@ -7,7 +7,7 @@ const userController = new UserController();
 const checkUserRole = require("../utils/checkrole.js");
 const passport = require("passport");
 
-router.get("/products", checkUserRole(['user']), passport.authenticate('jwt', { session: false }), viewsController.renderProducts);
+router.get("/products", checkUserRole(['user','premium']), passport.authenticate('jwt', { session: false }), viewsController.renderProducts);
 router.get("/carts/:cid", viewsController.renderCart);
 router.get("/login", viewsController.renderLogin);
 router.get("/register", viewsController.renderRegister);

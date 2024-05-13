@@ -55,6 +55,8 @@ class CartController {
         try {
 
             let cart = await cartRepository.getCartById(req.params.cid);
+            let owner = req.user.email;
+
             if (!cart) {
                 res.status(404).send({ status: "Error", error: "Carrito no encontrado" });
                 return;
@@ -63,6 +65,11 @@ class CartController {
             const product = await productRepository.getProductById(req.params.pid);
             if (!product) {
                 res.status(404).send({ status: "Error", error: "Producto no encontrado" });
+                return;
+            }
+            
+            if (product.owner == owner) {
+                res.status(401).send({ status: "Error", error: "No es posible agregar tus propios productos al carrito" });
                 return;
             }
 
