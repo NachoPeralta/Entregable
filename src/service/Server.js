@@ -27,6 +27,10 @@ const errorHandler = require("../utils/errorHandler.js");
 //Logger
 const logger = require("../service/logs/logger.js");
 
+//Documentation
+const swaggerJSDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+
 class Server {
     // Se crea una instancia de express para crear el servidor.
     constructor() {
@@ -95,6 +99,22 @@ class Server {
         //Chat y RealTimeProducts
         const SocketManager = require("../sockets/socketmanager.js");
         new SocketManager(httpServer);
+
+        //Swagger 
+
+        const swaggerOptions = {
+            definition: {
+                openapi: '3.0.0',
+                info: {
+                    title: 'Documentación Ecommerce',
+                    description: 'Ecommerce de Productos',
+                    version: '1.0.0',
+                }
+            },
+            apis: ["./src/docs/**/*.yaml"]
+        }
+        const specs = swaggerJSDoc(swaggerOptions);
+        this.app.use('/apidocs', swaggerUi.serve, swaggerUi.setup(specs));
     }
 }
 

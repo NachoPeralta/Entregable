@@ -1,0 +1,194 @@
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del producto Autogenerado por MongoDB
+        title:
+          type: string
+          description: Título del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        code:
+          type: string
+          description: Código único del producto
+        stock:
+          type: integer
+          description: Cantidad en stock del producto
+        category:
+          type: string
+          description: Categoría del producto
+        status:
+          type: boolean
+          description: Estado del producto (disponible o no)
+        thumbnail:
+          type: array
+          items:
+            type: string
+            description: URL de las imágenes del producto
+        owner:
+          type: string
+          description: Propietario del producto
+
+paths:
+  /api/products:
+    get:
+      summary: Devuelve todos los productos o la cantidad de productos que se le pase como limit
+      tags: 
+        - Users
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+          description: Número de productos a devolver
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+          description: Página de resultados
+        - in: query
+          name: category
+          required: false
+          schema:
+            type: string
+          description: Categoría de los productos a devolver
+        - in: query
+          name: sort
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Orden de los productos por precio
+      responses:
+        '200':
+          description: Lista de productos obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '401':
+          description: Error al obtener los productos
+
+    post:
+      summary: Crea un producto y lo devuelve
+      tags: 
+        - Users
+      requestBody:
+        description: Datos del producto
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          description: Error al crear el producto
+
+  /api/products/{pid}:
+    get:
+      summary: Devuelve un producto dado su ID
+      tags: 
+        - Users
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+          description: ID del producto
+      responses:
+        '200':
+          description: Producto obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Producto no encontrado
+
+    put:
+      summary: Actualiza un producto dado su ID
+      tags: 
+        - Users
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+          description: ID del producto
+      requestBody:
+        description: Datos del producto actualizados
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Producto actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Producto no encontrado
+        '401':
+          description: No se pudo actualizar el producto
+
+    delete:
+      summary: Elimina un producto dado su ID
+      tags: 
+        - Users
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+          description: ID del producto
+      responses:
+        '200':
+          description: Producto eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Producto no encontrado
+        '401':
+          description: No se pudo eliminar el producto
+
+  /api/products/generate:
+    post:
+      summary: Genera 100 productos de prueba y los devuelve
+      tags: 
+        - Users
+      responses:
+        '200':
+          description: Productos generados exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '401':
+          description: Error al generar los productos
