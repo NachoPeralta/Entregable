@@ -5,18 +5,34 @@ const UserController = require("../controller/userController");
 const userController = new UserController();
 const { generateToken } = require("../utils/jsonwebtoken.js");
 
+// Registro de Usuario
 router.post("/register", userController.register);
+
+// Login de Usuario
 router.post("/login", userController.login);
+
+// Logout de Usuario
 router.post("/logout", userController.logout.bind(userController));
+
+// Perfil de Usuario
 router.get("/profile", passport.authenticate("jwt", { session: false }), userController.profile);
+
+// Usuario Administrador
 router.get("/admin", passport.authenticate("jwt", { session: false }), userController.admin);
 
+// Error en Login de Usuario
 router.get("/faillogin", userController.failLogin);
+
+// Error en Registro de Usuario
 router.get("/failregister", userController.failRegister);
 
+// Request para restablecer contraseña
 router.post("/requestPasswordReset", userController.requestPasswordReset);
+
+// Reset password
 router.post('/reset-password', userController.resetPassword);
 
+// Login con gitHub
 router.get("/github", passport.authenticate("github", { scope: ["user:email"] }), async (req, res) => {
     res.send("Login con github");
 });
@@ -40,6 +56,7 @@ router.get("/githubcallback", passport.authenticate("github", { failureRedirect:
     userController.profile(req, res);
 });
 
+// Cambio de rol a premium
 router.post("/premium/:uid", userController.changeRoleToPremium);
 
 

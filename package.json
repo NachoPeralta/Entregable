@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha src/test/supertest.test.mjs",
     "start": "node src/main.js --mode prod",
     "dev": "nodemon src/main.js --mode dev"
   },
@@ -15,7 +15,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "chai": "^5.1.1",
+    "mocha": "^10.4.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^7.0.0"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",

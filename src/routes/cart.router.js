@@ -31,6 +31,7 @@ router.put('/:cid', cartController.updateCartProducts);
 // Actualiza cantidades de productos en el carrito. Si el producto no existe en el mismo lo agrega.
 router.put('/:cid/product/:pid', cartController.updateProductQuantity);
 
+// Finaliza la compra del carrito dado su ID.
 router.post('/:cid/purchase', passport.authenticate('jwt', { session: false }), cartController.endPurchase);
 
 
