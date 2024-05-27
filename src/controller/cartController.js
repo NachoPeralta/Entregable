@@ -166,7 +166,7 @@ class CartController {
             const product = await productRepository.getProductById(productId);
             if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
 
-            const updatedCart = await cartRepository.addProductToCart(cartId, productId, newQuantity);
+            const updatedCart = await cartRepository.addProductToCart(cart, product, newQuantity);
 
             res.json({
                 status: 'success',

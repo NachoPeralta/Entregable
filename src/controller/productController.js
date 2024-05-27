@@ -118,7 +118,7 @@ class ProductController {
 
     async generateProducts(req, res) {
         try {
-            logger.info("Generando Productos de prueba... ",info); 
+            logger.info("Generando Productos de prueba... "); 
 
             let products = [];
 

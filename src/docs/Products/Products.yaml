@@ -176,8 +176,8 @@ paths:
         '401':
           description: No se pudo eliminar el producto
 
-  /api/products/generate:
-    post:
+  /mockingproducts:
+    get:
       summary: Genera 100 productos de prueba y los devuelve
       tags: 
         - Products
