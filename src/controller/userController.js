@@ -35,7 +35,8 @@ class UserController {
                 email,
                 cart: newCart._id,
                 password: createHash(password),
-                age
+                age,
+                last_connection: new Date()
             });
 
             await newUser.save();
@@ -77,12 +78,16 @@ class UserController {
                     code: Errors.INVALID_CREDENCIALS
                 });
             }
+            
+            userExist.last_connection = new Date();
+            await userExist.save();
 
             const token = generateToken({ user: userExist });
             res.cookie("coderCookieToken", token, {
                 maxAge: 3600000,
                 httpOnly: true
             });
+
 
             res.redirect("/api/users/profile");
 
@@ -100,9 +105,19 @@ class UserController {
     }
 
     async logout(req, res) {
-        res.clearCookie("coderCookieToken");
-        req.session.destroy();
-        res.redirect("/");
+        try {
+            req.user.last_connection = new Date();
+            await req.user.save();
+
+            res.clearCookie("coderCookieToken");
+            req.session.destroy();
+            res.redirect("/");
+
+        } catch (error) {
+            logger.error(error);
+            res.status(500).send("Error interno del servidor");
+            return;
+        }
     }
 
     async admin(req, res) {
@@ -209,9 +224,19 @@ class UserController {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
 
+            // Verifico Documentos cargados
+            const requiredDocuments = ['Identificación', 'Comprobante de domicilio', 'Comprobante de estado de cuenta'];
+            const userDocuments = user.documents.map(doc => doc.name);
+
+            const hasRequiredDocuments = requiredDocuments.every(doc => userDocuments.includes(doc));
+
+            if (!hasRequiredDocuments) {
+                return res.status(400).json({ message: 'El usuario debe cargar los siguientes documentos: Identificación, Comprobante de domicilio, Comprobante de estado de cuenta' });
+            }
+
             const newRol = user.role === 'user' ? 'premium' : 'user';
             const updated = await UserModel.findByIdAndUpdate(uid, { role: newRol }, { new: true });
-            
+
             logger.info("Usuario modificado - Role:" + updated.role);
 
             res.json(updated);
