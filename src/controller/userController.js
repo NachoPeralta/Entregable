@@ -105,19 +105,20 @@ class UserController {
     }
 
     async logout(req, res) {
-        try {
-            req.user.last_connection = new Date();
-            await req.user.save();
 
-            res.clearCookie("coderCookieToken");
-            req.session.destroy();
-            res.redirect("/");
-
-        } catch (error) {
-            logger.error(error);
-            res.status(500).send("Error interno del servidor");
-            return;
+        if (req.user) {
+            try {
+                req.user.last_connection = new Date();
+                await req.user.save();
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error interno del servidor");
+                return;
+            }
         }
+
+        res.clearCookie("coderCookieToken");
+        res.redirect("/login");
     }
 
     async admin(req, res) {
