@@ -209,6 +209,7 @@ class ViewsController {
             const limit = parseInt(req.query.limit) || 10;
             const page = parseInt(req.query.page) || 1;
             const loggedInUserId = req.user._id; 
+            const role = req.user.role;
 
             // Contar la cantidad total de usuarios excepto el logueado
             const totalUsers = await UserModel.countDocuments({ _id: { $ne: loggedInUserId } });
@@ -238,6 +239,7 @@ class ViewsController {
                 hasPrevPage,
                 hasNextPage,
                 docs: usersDto,
+                role:  req.user ? req.user.role : null,
             });
 
         } catch (error) {
