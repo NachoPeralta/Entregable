@@ -22,7 +22,10 @@ class EmailManager {
                 html: `
                     <h1>Confirmación de compra</h1>
                     <p>Gracias por tu compra, ${first_name}!</p>
-                    <p>El número de tu orden es: ${ticket}</p>
+                    <p>El número de tu orden es: ${ticket.code}</p>
+                    <p>El equipo de ventas se pondrá en contacto contigo para realizar la entrega</p>
+                    <br/>
+                    <p>Que tengas un gran día! </p>
                 `
             };
 
@@ -46,6 +49,27 @@ class EmailManager {
                     <p>Este código expirará en 1 hora.</p>
                     <a href="http://localhost:8080/password">Restablecer Contraseña</a>
                     <p>Si no solicitaste este restablecimiento, ignora este correo.</p>
+                `
+            };
+
+            await this.transporter.sendMail(mailOptions);
+        } catch (error) {
+            logger.error("Error al enviar correo electrónico:", error);
+            throw new Error("Error al enviar correo electrónico");
+        }
+    }
+
+    async sendNotificationEmail(email, first_name, subject, message) {
+        try {
+            const mailOptions = {
+                from: 'wiperalta@gmail.com',
+                to: email,
+                subject: subject,
+                html: `
+                    <h1>${subject}</h1>
+                    <p>Hola ${first_name},</p>
+                    <p>${message}</p>
+                    <p>Que tengas un gran día!</p>
                 `
             };
 

@@ -8,6 +8,9 @@ const UserModel = require("../models/user.model.js");
 const TicketModel = require("../models/ticket.model.js");
 const { generateUniqueCode, calcTotal } = require("../utils/checkout.js");
 
+const EmailManager = require("../service/email.js");
+const emailManager = new EmailManager();
+
 const mongoose = require('mongoose');
 
 class CartController {
@@ -183,6 +186,7 @@ class CartController {
 
     async endPurchase(req, res) {
         const cartId = req.params.cid;
+        const { email, first_name } = req.user;
         try {
             // Obtener el carrito y sus productos
             const cart = await cartRepository.getCartById(cartId);
@@ -222,6 +226,8 @@ class CartController {
 
             // Guardar el carrito actualizado en la base de datos
             await cart.save();
+
+            await emailManager.sendConfirmationEmail(email, first_name, ticket);
 
             res.status(200).json({ cartId: cart._id, ticketId: ticket._id });
 

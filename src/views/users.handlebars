@@ -1,0 +1,142 @@
+<h1>Bienvenid@ {{first_name}} {{last_name}} </h1>
+<h4>Rol: {{role}}</h4>
+
+<form action="/api/users/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
+<form action="/api/users/profile" method="get">
+  <button type="submit">Profile</button>
+</form>
+
+<br>
+<h2>{{title}}</h2>
+<div>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Nombre</th>
+        <th>Rol</th>
+        <th>Última Conexión </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each users}}
+        <tr>
+          <td>{{this.email}}</td>
+          <td>{{this.first_name}}</td>
+          <td>{{this.role}}</td>
+          <td>{{this.last_connection}}</td>          
+          <td>                       
+            <button class="btnDeleteUser" onclick="deleteUser('{{this._id}}')">Eliminar</button>
+            <button class="btnChangeRole" onclick="changeRole('{{this._id}}')">Cambiar Rol</button>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+    {{#if hasPrevPage}}
+    <a href="/users?page={{prevPage}}&limit={{limit}}"> Anterior </a>
+  {{/if}}
+  {{#if hasNextPage}}
+    <a href="/users?page={{nextPage}}&limit={{limit}}"> Siguiente </a>
+  {{/if}}
+  <p>Pagina {{page}} de {{totalPages}} </p>
+</div>
+
+<br>
+<button class="btnDeleteInactiveUsers" onclick="deleteOldUsers()">Eliminar Usuarios Inactivos</button>
+<br>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<script src="js/realtime.js"></script>
+
+<script>
+    function deleteUser(uid) {
+        fetch(`/api/users/delete_user/${uid}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al eliminar el Usuario');
+                }
+                
+                Swal.fire({
+                  icon: 'success',
+                  title: '¡Éxito!',
+                  text: 'Usuario eliminado con éxito',
+                  confirmButtonText: 'Aceptar'
+                }).then(() => {
+                  location.reload();
+                });
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                  icon: 'error',
+                  title: '¡Error!',
+                  text: error.message,
+                  confirmButtonText: 'Aceptar'
+                });
+            });
+    }
+
+    function deleteOldUsers() {
+        fetch(`/api/users/`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al Eliminar Usuarios inactivos');
+                }
+                
+                Swal.fire({
+                  icon: 'success',
+                  title: '¡Éxito!',
+                  text: 'Usuarios inactivos eliminados con éxito',
+                  confirmButtonText: 'Aceptar'
+                }).then(() => {
+                  location.reload();
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                  icon: 'error',
+                  title: '¡Error!',
+                  text: error.message,
+                  confirmButtonText: 'Aceptar'
+                });
+            });
+    }
+
+    function changeRole(uid) {
+        fetch(`/api/users/premium/${uid}`, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al Cambiar de Rol, verifique la documentación de usuario');
+                }                
+                Swal.fire({
+                  icon: 'success',
+                  title: '¡Éxito!',
+                  text: 'Rol de Usuario cambiado con éxito',
+                  confirmButtonText: 'Aceptar'
+                }).then(() => {
+                  location.reload();
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                  icon: 'error',
+                  title: '¡Error!',
+                  text: error.message,
+                  confirmButtonText: 'Aceptar'
+                });
+            });
+    }
+</script>

@@ -1,12 +1,12 @@
 const socket = io();
 
-const deleteProduct = (id) => {
-    socket.emit("deleteProduct", id);
+const deleteProduct = (pid) => {
+    socket.emit("deleteProduct", pid);
     location.reload();
 }
 
 const addProduct = (owner) => {
-    
+
     const product = {
         title: document.getElementById("title").value,
         description: document.getElementById("description").value,
@@ -20,5 +20,7 @@ const addProduct = (owner) => {
     };
 
     socket.emit("addProduct", product);
-    location.reload();
+    location.reload(); 
 };
+
+

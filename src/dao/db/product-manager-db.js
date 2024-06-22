@@ -49,7 +49,7 @@ class ProductManager {
                 });
             }
             //Filtro por User Owner
-            if (owner) {
+            if (owner !== "admin") {
                 criteria.push({
                     $match: {
                         owner: owner,

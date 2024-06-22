@@ -1,7 +1,9 @@
 const socket = require("socket.io");
-const ProductRepository = require("../repositories/product.repository.js");
-const productRepository = new ProductRepository();
 const MessageModel = require("../models/message.model.js");
+const UserController = require("../controller/userController");
+const userController = new UserController();
+const ProductController = require("../controller/productController");
+const productController = new ProductController();
 
 class SocketManager {
     constructor(httpServer) {
@@ -24,20 +26,36 @@ class SocketManager {
 
             // Agregar nuevo producto
             socket.on("addProduct", async (product) => {
-                await productRepository.addProduct(product);
+                await productController.addProduct(product);
                 this.emitUpdatedProducts(socket)
             });
 
             // Eliminar producto
-            socket.on("deleteProduct", async (id) => {
-                await productRepository.deleteProduct(id);
+            socket.on("deleteProduct", async (pid) => {
+                await productController.deleteProduct(pid);
                 this.emitUpdatedProducts(socket)
-            });        
+            });
+            
+            // Eliminar usuario
+            socket.on("deleteUser", async (id) => {
+                await userController.deleteUser(id);
+                this.emitUpdatedProducts(socket)
+            });
+
+            // Eliminar usuarios antiguos
+            socket.on("deleteOldUsers", async () => {
+                await userController.deleteOldUsers();
+                this.emitUpdatedProducts(socket)
+            })
         });
     }
 
     async emitUpdatedProducts(socket) {
-        socket.emit("products", await productRepository.getProducts);
+        socket.emit("products", await productController.getProducts);
+    }
+
+    async emitUpdateUsers(socket) {
+        socket.emit("users", await userController.getUsers);
     }
 }
 

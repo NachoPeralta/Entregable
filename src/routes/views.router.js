@@ -12,7 +12,7 @@ router.get("/carts/:cid", viewsController.renderCart);
 router.get("/login", viewsController.renderLogin);
 router.get("/register", viewsController.renderRegister);
 router.get("/realtimeproducts", checkUserRole(['admin', 'premium']), passport.authenticate('jwt', { session: false }), viewsController.renderRealTimeProducts);
-router.get("/chat", checkUserRole(['user']), viewsController.renderChat);
+router.get("/chat", checkUserRole(['user','premium']), viewsController.renderChat);
 router.get("/", viewsController.renderLogin);
 router.get("/endPurchase/:cid/ticket/:tid", viewsController.renderPurchase);
 

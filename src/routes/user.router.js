@@ -6,6 +6,10 @@ const userController = new UserController();
 const { generateToken } = require("../utils/jsonwebtoken.js");
 const upload = require("../middleware/multerUpload.js");
 const UserModel = require("../models/user.model.js");
+const ViewsController = require("../controller/viewsController.js");
+const viewsController = new ViewsController();
+const checkUserRole = require("../utils/checkrole.js");
+
 
 // Registro de Usuario
 router.post("/register", userController.register);
@@ -59,8 +63,8 @@ router.get("/githubcallback", passport.authenticate("github", { failureRedirect:
 });
 
 // Cambio de rol a premium
-router.post("/premium/:uid", userController.changeRoleToPremium);
-
+router.post("/premium/:uid", checkUserRole(['admin']), passport.authenticate('jwt', { session: false }), userController.changeRoleToPremium);
+ 
 // Upload de documentos de usuario
 router.post('/:uid/documents', upload.fields([
     { name: 'document' }, { name: 'products' }, { name: 'profile' }]), async (req, res) => {
@@ -84,13 +88,13 @@ router.post('/:uid/documents', upload.fields([
                 if (uploadedDocuments.products) {
                     user.documents = user.documents.concat(uploadedDocuments.products.map(doc => ({
                         name: doc.originalname,
-                        reference: doc.path 
+                        reference: doc.path
                     })));
                 }
                 if (uploadedDocuments.profile) {
                     user.documents = user.documents.concat(uploadedDocuments.profile.map(doc => ({
                         name: doc.originalname,
-                        reference: doc.path 
+                        reference: doc.path
                     })));
                 }
             }
@@ -101,6 +105,11 @@ router.post('/:uid/documents', upload.fields([
             console.error(error);
             res.status(500).send('Error interno del servidor');
         }
-    });
+});
+
+// Mantenimiento de Usuarios
+router.get("/",                     checkUserRole(['admin']), passport.authenticate('jwt', { session: false }), viewsController.renderUsers);
+router.delete("/delete_user/:uid",  checkUserRole(['admin']), passport.authenticate('jwt', { session: false }), userController.deleteUser);
+router.delete("/",                  checkUserRole(['admin']), passport.authenticate('jwt', { session: false }), userController.deleteOldUsers);
 
 module.exports = router;

@@ -6,6 +6,9 @@
 <form action="/api/users/logout" method="post">
     <button type="submit">Logout</button>
 </form>
+<form action="/api/users/profile" method="get">
+  <button type="submit">Profile</button>
+</form>
 
 <br>
 <h2>{{title}}</h2>
@@ -29,6 +32,9 @@
           <td>{{this.description}}</td>
           <td>{{this.stock}}</td>
           <td>{{this.price}}</td>
+          <td>
+            <img src="{{this.thumbnail}}" alt="Imagen del producto" style="max-width: 100px; max-height: 100px;">
+          </td>
           <td>
             Cantidad
           </td>

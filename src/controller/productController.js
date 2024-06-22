@@ -2,6 +2,9 @@
 const ProductRepository = require("../repositories/product.repository");
 const productRepository = new ProductRepository();
 const logger = require("../service/logs/logger.js");
+const EmailManager = require("../service/email.js");
+const emailManager = new EmailManager();
+const UserModel = require("../models/user.model.js");
 
 class ProductController {
 
@@ -65,21 +68,26 @@ class ProductController {
         }
     }
 
-    async addProduct(req, res) {
+    async addProduct(reqOrProduct, res = null) {
         try {
-            const product = req.body;
-
+            const product = typeof reqOrProduct === 'object' && !reqOrProduct.params ? reqOrProduct : reqOrProduct.body;
             const newProduct = await productRepository.addProduct(product);
+            
             if (!newProduct) {
-                res.status(400).send({ status: "Error", error: "No se pudo agregar el producto, verifique los datos ingresados" });
+                if (res) {
+                    res.status(400).send({ status: "Error", error: "No se pudo agregar el producto, verifique los datos ingresados" });
+                }
                 return;
             }
-            res.status(201).send({ status: "Success", product: { newProduct } });
 
+            if (res) {
+                res.status(201).send({ status: "Success", product: newProduct });
+            }
         } catch (error) {
-            logger.error("No se pudo agregar el producto. ",error);
-            res.status(401).send({ status: "Error", error: "No se pudo agregar el producto" });
-            return;
+            logger.error("No se pudo agregar el producto. ", error);
+            if (res) {
+                res.status(401).send({ status: "Error", error: "No se pudo agregar el producto" });
+            }
         }
     }
 
@@ -101,18 +109,39 @@ class ProductController {
         }
     }
 
-    async deleteProduct(req, res) {
+    async deleteProduct(reqOrPid, res = null) {
         try {
-            const deletedProduct = await productRepository.deleteProduct(req.params.pid);
+            const productId = typeof reqOrPid === 'string' ? reqOrPid : reqOrPid.params.pid;
+            const deletedProduct = await productRepository.deleteProduct(productId);
+
             if (!deletedProduct) {
-                res.status(404).send({ status: "Error", error: "Producto no encontrado" });
+                if (res) {
+                    res.status(404).send({ status: "Error", error: "Producto no encontrado" });
+                }
                 return;
             }
-            res.status(200).send({ status: "Success", deletedProduct: deletedProduct });
+
+            const ownerEmail = deletedProduct.owner;
+            const owner = await UserModel.findOne({ email: ownerEmail });
+
+            if (owner && owner.role === 'premium') {
+                await emailManager.sendNotificationEmail(
+                    owner.email,
+                    owner.first_name,
+                    "Producto eliminado",
+                    `Tu producto "${deletedProduct.title}" ha sido eliminado de la tienda.`
+                );
+            }
+
+            if (res) {
+                res.status(200).send({ status: "Success", deletedProduct: deletedProduct });
+            }
+
         } catch (error) {
-            logger.error("No se pudo eliminar el producto. ",error); 
-            res.status(401).send({ status: "Error", error: "No se pudo eliminar el producto" });
-            return;
+            logger.error("No se pudo eliminar el producto. ", error);
+            if (res) {
+                res.status(401).send({ status: "Error", error: "No se pudo eliminar el producto" });
+            }
         }
     }
 

@@ -10,6 +10,8 @@ const logger = require("../service/logs/logger.js");
 const { generateResetToken } = require("../utils/resetToken.js");
 const EmailManager = require("../service/email.js");
 const emailManager = new EmailManager();
+const ViewsController = require("../controller/viewsController.js");
+const viewsController = new ViewsController();
 
 class UserController {
     async register(req, res, next) {
@@ -98,7 +100,7 @@ class UserController {
     }
 
     async profile(req, res) {
-        const userDto = new UserDTO(req.user.first_name, req.user.last_name, req.user.role);
+        const userDto = new UserDTO(req.user.first_name, req.user.last_name, req.user.email, req.user.role, req.user.last_connection);
         const isAdmin = req.user.role === 'admin';
         const isPremium = req.user.role === 'premium';
         res.render("profile", { user: userDto, isAdmin, isPremium });
@@ -218,35 +220,111 @@ class UserController {
     async changeRoleToPremium(req, res) {
         try {
             const { uid } = req.params;
-
+                
+            // Buscamos al usuario en la base de datos
             const user = await UserModel.findById(uid);
-
+    
             if (!user) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
-
-            // Verifico Documentos cargados
-            const requiredDocuments = ['Identificación', 'Comprobante de domicilio', 'Comprobante de estado de cuenta'];
-            const userDocuments = user.documents.map(doc => doc.name);
-
+    
+            // Documentos requeridos
+            const requiredDocuments = ['Identificacion', 'Comprobante de domicilio', 'Comprobante de estado de cuenta'];
+            
+            // Extraemos los nombres base de los documentos que el usuario ha subido
+            const userDocuments = user.documents ? user.documents.map(doc => doc.name.split('.')[0]) : [];
+    
+            // Verificamos si el usuario tiene todos los documentos requeridos
             const hasRequiredDocuments = requiredDocuments.every(doc => userDocuments.includes(doc));
-
+    
             if (!hasRequiredDocuments) {
-                return res.status(400).json({ message: 'El usuario debe cargar los siguientes documentos: Identificación, Comprobante de domicilio, Comprobante de estado de cuenta' });
+                return res.status(400).json({ 
+                    message: 'El usuario debe cargar los siguientes documentos: ' + requiredDocuments.join(', ') 
+                });
             }
+    
+            // Cambiamos el rol del usuario
+            const newRole = user.role === 'user' ? 'premium' : 'user';
+            const updatedUser = await UserModel.findByIdAndUpdate(uid, { role: newRole }, { new: true });
+    
+            res.json(updatedUser);
+    
+        } catch (error) {
+            res.status(500).json({ message: 'Error interno del servidor' });
+        }
+    }
+    
+    async getUsers(req, res) {
+        try {
+            const users = await UserModel.find().sort({ last_connection: 1 }); // 1 para orden ascendente
+            
+            // Mapear a UserDTO
+            const usersDto = users.map(user => new UserDTO(user.first_name, user.last_name, user.email, user.role, user.last_connection));
+            
+            res.status(200).json({ status: "Success", users: usersDto });
 
-            const newRol = user.role === 'user' ? 'premium' : 'user';
-            const updated = await UserModel.findByIdAndUpdate(uid, { role: newRol }, { new: true });
+        } catch (error) {
+            logger.error(error);
+            return res.json({ message: 'Error interno del servidor' });
+        }
+    }
 
-            logger.info("Usuario modificado - Role:" + updated.role);
-
-            res.json(updated);
-
+    async deleteOldUsers(req, res) {
+        try {
+            // Elimino los usuarios que estuvieron inactivos durante dos días
+            const twoDaysAgo = new Date(Date.now() - 2 * 86400000);
+    
+            // Buscar usuarios inactivos o sin last_connection
+            const inactiveUsers = await UserModel.find({
+                $or: [
+                    { last_connection: { $lt: twoDaysAgo } },
+                    { last_connection: { $exists: false } }
+                ]
+            });
+    
+            // Enviar correos a los usuarios inactivos antes de eliminarlos
+            for (const user of inactiveUsers) {
+                await emailManager.sendNotificationEmail(user.email, user.first_name, "Eliminación por inactividad", "Tu cuenta ha sido eliminada por inactividad.");
+            }
+    
+            // Eliminar usuarios inactivos o sin last_connection
+            await UserModel.deleteMany({
+                $or: [
+                    { last_connection: { $lt: twoDaysAgo } },
+                    { last_connection: { $exists: false } }
+                ]
+            });
+    
+            // Renderizar la vista de usuarios después de la eliminación
+            viewsController.renderUsers(req, res);
+    
         } catch (error) {
             logger.error(error);
             res.status(500).json({ message: 'Error interno del servidor' });
         }
     }
+    
+    
+    async deleteUser(req, res) {
+        try {
+            const { uid } = req.params;
+            const user = await UserModel.findById(uid);
+    
+            if (user) {
+                // Enviar correo al usuario antes de eliminarlo
+                await emailManager.sendNotificationEmail(user.email, user.first_name, "Cuenta eliminada", "Tu cuenta ha sido eliminada porque no cumple con los requisitos de la tienda.");
+    
+                // Eliminar el usuario
+                await UserModel.findByIdAndDelete(uid);
+            }
+    
+            viewsController.renderUsers(req, res);
+        } catch (error) {
+            logger.error(error);
+            res.status(500).json({ message: 'Error interno del servidor' });
+        }
+    }
+    
 }
 
 module.exports = UserController;

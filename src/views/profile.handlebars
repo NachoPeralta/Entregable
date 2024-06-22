@@ -7,8 +7,10 @@
 <br />
 
 {{#if this.isAdmin}}
-  <a href="/realtimeproducts">Modificar Productos</a>
+  <a href="/realtimeproducts">Administrador de Productos</a>
   <br />
+  <a href="/api/users"> Administrador de Usuarios</a>
+  <br>
 {{else}}
   {{#if this.isPremium}}
     <a href="/realtimeproducts">Modificar Productos</a>

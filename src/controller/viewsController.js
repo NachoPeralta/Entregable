@@ -6,6 +6,8 @@ const TicketRepository = require("../repositories/ticket.repository.js");
 const ticketRepository = new TicketRepository();
 const UserModel = require("../models/user.model.js");
 const logger = require("../service/logs/logger.js");
+const UserDTO = require("../dto/user.dto.js");
+
 
 class ViewsController {
     async renderProducts(req, res) {
@@ -15,11 +17,11 @@ class ViewsController {
             let category = req.query.category || "";
             let sort = req.query.sort || "asc";
             let title = "Listado de Productos"
-            
+
             const products = await productRepository.getProducts(limit, page, category, sort);
 
             if (!products) {
-                logger.info("No se encontraron productos",info);
+                logger.info("No se encontraron productos", info);
                 res.status(404).send({ status: "error", error: "No se encontraron productos" });
                 return;
             }
@@ -54,7 +56,7 @@ class ViewsController {
             });
 
         } catch (error) {
-            logger.error("Error al traer los productos",error); 
+            logger.error("Error al traer los productos", error);
             res.status(401).send({ status: "error", error: "Error al traer los productos" });
         }
     }
@@ -68,7 +70,7 @@ class ViewsController {
             const cart = await cartRepository.getCartById(cartId);
 
             if (!cart) {
-                logger.info("Carrito no encontrado.",info);
+                logger.info("Carrito no encontrado.", info);
                 return res.status(404).json({ error: "Carrito no encontrado" });
             }
 
@@ -77,8 +79,8 @@ class ViewsController {
             const cartProducts = cart.products.map(item => {
                 const product = item.product ? item.product.toObject() : null;
                 const quantity = item.quantity;
-                const totalPrice =( product ? product.price : 0 ) * quantity;
-                
+                const totalPrice = (product ? product.price : 0) * quantity;
+
                 totalBuy += totalPrice;
 
                 return {
@@ -88,16 +90,17 @@ class ViewsController {
                 };
             });
 
-            res.render("cart", { 
-                products: cartProducts, 
-                totalBuy, 
-                cartId, 
-                title, 
+            res.render("cart", {
+                products: cartProducts,
+                totalBuy,
+                cartId,
+                title,
                 cartInfo,
-                hasTicket: false });
+                hasTicket: false
+            });
 
         } catch (error) {
-            logger.error("Error del servidor al obtener el carrito",error); 
+            logger.error("Error del servidor al obtener el carrito", error);
             res.status(500).json({ error: "Error interno del servidor" });
         }
     }
@@ -116,7 +119,7 @@ class ViewsController {
             let page = parseInt(req.query.page) || 1;
             let sort = req.query.sort || "asc";
             let title = "Listado de Productos";
-            let owner = req.user.role !== "admin" ? req.user.email : null;
+            let owner = req.user.role !== "admin" ? req.user.email : req.user.role;
             
             const products = await productRepository.getProducts(limit, page, null, sort, owner);
 
@@ -129,7 +132,7 @@ class ViewsController {
                 const { ...rest } = product;
                 return rest;
             });
-    
+
             res.render("realtimeproducts", {
                 products: result,
                 totalPages: products.totalPages,
@@ -141,20 +144,20 @@ class ViewsController {
                 prevLink: products.hasPrevPage ? `/realtimeproducts?page=${products.prevPage}` : null,
                 nextLink: products.hasNextPage ? `/realtimeproducts?page=${products.nextPage}` : null,
                 limit: limit,
-                page: page,                
+                page: page,
                 title,
                 first_name: req.user ? req.user.first_name : null,
                 last_name: req.user ? req.user.last_name : null,
                 role: req.user ? req.user.role : null,
                 owner: owner
             });
-    
-        } catch (error) {            
-            logger.error("Error en la vista de productos en tiempo real. ",error); 
+
+        } catch (error) {
+            logger.error("Error en la vista de productos en tiempo real. ", error);
             res.status(500).json({ error: "Error interno del servidor" });
         }
     }
-    
+
     async renderChat(req, res) {
         res.render("chat");
     }
@@ -172,7 +175,7 @@ class ViewsController {
             const cartInfo = "Productos pendientes de compra. Momentaneamente sin stock";
             const title = "Compra Finalizada";
             const hasTicket = true;
-    
+
             res.render("cart", {
                 products,
                 cart,
@@ -184,11 +187,11 @@ class ViewsController {
             });
 
         } catch (error) {
-            logger.error("Error al renderizar finalizar compra. ",error); 
+            logger.error("Error al renderizar finalizar compra. ", error);
             res.status(500).json({ error: "Error interno del servidor" });
         }
     }
-            
+
     async renderResetPassword(req, res) {
         res.render("resetpassword");
     }
@@ -196,11 +199,53 @@ class ViewsController {
     async renderChangePassword(req, res) {
         res.render("changepassword");
     }
-    
-    async renderConfirmationRestore(req, res){
+
+    async renderConfirmationRestore(req, res) {
         res.render("confirmation-restore");
     }
-    
+
+    async renderUsers(req, res) {
+        try {
+            const limit = parseInt(req.query.limit) || 10;
+            const page = parseInt(req.query.page) || 1;
+            const loggedInUserId = req.user._id; 
+
+            // Contar la cantidad total de usuarios excepto el logueado
+            const totalUsers = await UserModel.countDocuments({ _id: { $ne: loggedInUserId } });
+
+            // Paginación
+            const skipCount = (page - 1) * limit;
+            let criteria = [
+                { $match: { _id: { $ne: loggedInUserId } } }, // Excluir el usuario logueado
+                { $skip: skipCount },
+                { $limit: limit },
+            ];
+
+            const users = await UserModel.aggregate(criteria);
+            const usersDto = users.map(user => new UserDTO(user.first_name, user.last_name, user.email, user.role, user.last_connection));
+
+            // Calcula las propiedades de paginación
+            const totalPages = Math.ceil(totalUsers / limit);
+            const hasNextPage = page < totalPages;
+            const hasPrevPage = page > 1;
+
+            res.render("users", {
+                users: usersDto,
+                totalPages,
+                prevPage: hasPrevPage ? page - 1 : null,
+                nextPage: hasNextPage ? page + 1 : null,
+                currentPage: page,
+                hasPrevPage,
+                hasNextPage,
+                docs: usersDto,
+            });
+
+        } catch (error) {
+            logger.error("Error al obtener los usuarios", error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
+    }
+
 }
 
 module.exports = ViewsController;
