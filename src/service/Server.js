@@ -69,7 +69,7 @@ class Server {
         this.app.set("view engine", "handlebars");
         
         //const viewsPath = path.join(__dirname, "../views");
-        const viewsPath = path.resolve(__dirname, "../views");
+        const viewsPath = path.join(__dirname, '../../views');
         console.log('Current directory:', __dirname);
         console.log('Views directory:', viewsPath);
         this.app.set("views", viewsPath);
