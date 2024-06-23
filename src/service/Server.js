@@ -67,12 +67,7 @@ class Server {
         // Configuracion de motor de plantilla y handlebars
         this.app.engine("handlebars", hbs.engine);
         this.app.set("view engine", "handlebars");
-        
-        //const viewsPath = path.join(__dirname, "../views");
-        const viewsPath = path.join(__dirname, '../../views');
-        console.log('Current directory:', __dirname);
-        console.log('Views directory:', viewsPath);
-        this.app.set("views", viewsPath);
+        this.app.set("views", path.join(__dirname, "../views"));
 
         // Passport
         initializePassport();
