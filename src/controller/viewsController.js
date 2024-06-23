@@ -17,8 +17,9 @@ class ViewsController {
             let category = req.query.category || "";
             let sort = req.query.sort || "asc";
             let title = "Listado de Productos"
+            let owner = req.user.role !== "admin" ? req.user.email : req.user.role;
 
-            const products = await productRepository.getProducts(limit, page, category, sort);
+            const products = await productRepository.getProducts(limit, page, category, sort, owner, true);
 
             if (!products) {
                 logger.info("No se encontraron productos", info);
@@ -121,7 +122,7 @@ class ViewsController {
             let title = "Listado de Productos";
             let owner = req.user.role !== "admin" ? req.user.email : req.user.role;
             
-            const products = await productRepository.getProducts(limit, page, null, sort, owner);
+            const products = await productRepository.getProducts(limit, page, null, sort, owner, false);
 
             if (!products) {
                 res.status(404).send({ status: "error", error: "No se encontraron productos" });

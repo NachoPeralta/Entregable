@@ -19,6 +19,7 @@
         <th>Descripción</th>
         <th>En Stock</th>
         <th>Precio</th>
+        <th>Propietario</th>
 
       </tr>
     </thead>
@@ -30,6 +31,7 @@
           <td>{{this.description}}</td>
           <td>{{this.stock}}</td>
           <td>{{this.price}}</td>          
+          <td>{{this.owner}}</td>          
           <td>                       
             <button class="btnDeleteProduct" onclick="deleteProduct('{{this._id}}')">Eliminar</button>
           </form>

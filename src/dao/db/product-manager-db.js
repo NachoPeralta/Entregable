@@ -34,7 +34,7 @@ class ProductManager {
         return product;
     }
 
-    async getProducts(limit = 10, page = 1, category, sort, owner) {
+    async getProducts(limit = 10, page = 1, category, sort, owner, tienda) {
     
         try {
 
@@ -49,13 +49,21 @@ class ProductManager {
                 });
             }
             //Filtro por User Owner
-            if (owner !== "admin") {
+            if (owner !== "admin" && !tienda) {
                 criteria.push({
                     $match: {
                         owner: owner,
                     }
                 });
             }
+            if (owner !== "admin" && tienda) {
+                criteria.push({
+                    $match: {
+                        owner: { $ne: owner }
+                    }
+                });
+            }
+            
 
             // Ordenamiento por precio del producto
             const sortOrder = sort === "asc" ? 1 : -1;

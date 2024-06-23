@@ -12,6 +12,7 @@ const EmailManager = require("../service/email.js");
 const emailManager = new EmailManager();
 const ViewsController = require("../controller/viewsController.js");
 const viewsController = new ViewsController();
+const upload = require("../middleware/multerUpload.js");
 
 class UserController {
     async register(req, res, next) {
@@ -80,7 +81,7 @@ class UserController {
                     code: Errors.INVALID_CREDENCIALS
                 });
             }
-            
+
             userExist.last_connection = new Date();
             await userExist.save();
 
@@ -220,47 +221,47 @@ class UserController {
     async changeRoleToPremium(req, res) {
         try {
             const { uid } = req.params;
-                
+
             // Buscamos al usuario en la base de datos
             const user = await UserModel.findById(uid);
-    
+
             if (!user) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
-    
+
             // Documentos requeridos
             const requiredDocuments = ['Identificacion', 'Comprobante de domicilio', 'Comprobante de estado de cuenta'];
-            
+
             // Extraemos los nombres base de los documentos que el usuario ha subido
             const userDocuments = user.documents ? user.documents.map(doc => doc.name.split('.')[0]) : [];
-    
+
             // Verificamos si el usuario tiene todos los documentos requeridos
             const hasRequiredDocuments = requiredDocuments.every(doc => userDocuments.includes(doc));
-    
+
             if (!hasRequiredDocuments) {
-                return res.status(400).json({ 
-                    message: 'El usuario debe cargar los siguientes documentos: ' + requiredDocuments.join(', ') 
+                return res.status(400).json({
+                    message: 'El usuario debe cargar los siguientes documentos: ' + requiredDocuments.join(', ')
                 });
             }
-    
+
             // Cambiamos el rol del usuario
             const newRole = user.role === 'user' ? 'premium' : 'user';
             const updatedUser = await UserModel.findByIdAndUpdate(uid, { role: newRole }, { new: true });
-    
+
             res.json(updatedUser);
-    
+
         } catch (error) {
             res.status(500).json({ message: 'Error interno del servidor' });
         }
     }
-    
+
     async getUsers(req, res) {
         try {
             const users = await UserModel.find().sort({ last_connection: 1 }); // 1 para orden ascendente
-            
+
             // Mapear a UserDTO
             const usersDto = users.map(user => new UserDTO(user.first_name, user.last_name, user.email, user.role, user.last_connection));
-            
+
             res.status(200).json({ status: "Success", users: usersDto });
 
         } catch (error) {
@@ -273,7 +274,7 @@ class UserController {
         try {
             // Elimino los usuarios que estuvieron inactivos durante dos días
             const twoDaysAgo = new Date(Date.now() - 2 * 86400000);
-    
+
             // Buscar usuarios inactivos o sin last_connection
             const inactiveUsers = await UserModel.find({
                 $or: [
@@ -281,12 +282,12 @@ class UserController {
                     { last_connection: { $exists: false } }
                 ]
             });
-    
+
             // Enviar correos a los usuarios inactivos antes de eliminarlos
             for (const user of inactiveUsers) {
                 await emailManager.sendNotificationEmail(user.email, user.first_name, "Eliminación por inactividad", "Tu cuenta ha sido eliminada por inactividad.");
             }
-    
+
             // Eliminar usuarios inactivos o sin last_connection
             await UserModel.deleteMany({
                 $or: [
@@ -294,37 +295,84 @@ class UserController {
                     { last_connection: { $exists: false } }
                 ]
             });
-    
+
             // Renderizar la vista de usuarios después de la eliminación
             viewsController.renderUsers(req, res);
-    
+
         } catch (error) {
             logger.error(error);
             res.status(500).json({ message: 'Error interno del servidor' });
         }
     }
-    
-    
+
     async deleteUser(req, res) {
         try {
             const { uid } = req.params;
             const user = await UserModel.findById(uid);
-    
+
             if (user) {
                 // Enviar correo al usuario antes de eliminarlo
                 await emailManager.sendNotificationEmail(user.email, user.first_name, "Cuenta eliminada", "Tu cuenta ha sido eliminada porque no cumple con los requisitos de la tienda.");
-    
+
                 // Eliminar el usuario
                 await UserModel.findByIdAndDelete(uid);
             }
-    
+
             viewsController.renderUsers(req, res);
         } catch (error) {
             logger.error(error);
             res.status(500).json({ message: 'Error interno del servidor' });
         }
     }
-    
+
+    async uploadDocuments(req, res) {
+        upload.fields([{ name: 'document' }, { name: 'products' }, { name: 'profile' }])(req, res, async (err) => {
+            if (err) {
+                console.error('Error al cargar archivos:', err);
+                return res.status(500).send('Error al cargar archivos');
+            }
+
+            const { uid } = req.params;
+            const uploadedDocuments = req.files;
+
+            try {
+                const user = await UserModel.findById(uid);
+
+                if (!user) {
+                    return res.status(404).send("Usuario no encontrado");
+                }
+
+                // Verificar si se subieron documentos y actualizar el usuario
+                if (uploadedDocuments) {
+                    if (uploadedDocuments.document) {
+                        user.documents = user.documents.concat(uploadedDocuments.document.map(doc => ({
+                            name: doc.originalname,
+                            reference: doc.path
+                        })));
+                    }
+                    if (uploadedDocuments.products) {
+                        user.documents = user.documents.concat(uploadedDocuments.products.map(doc => ({
+                            name: doc.originalname,
+                            reference: doc.path
+                        })));
+                    }
+                    if (uploadedDocuments.profile) {
+                        user.documents = user.documents.concat(uploadedDocuments.profile.map(doc => ({
+                            name: doc.originalname,
+                            reference: doc.path
+                        })));
+                    }
+                }
+
+                await user.save();
+
+                res.status(200).send("Documentos subidos exitosamente");
+            } catch (error) {
+                console.error('Error al procesar documentos:', error);
+                res.status(500).send('Error interno del servidor');
+            }
+        });
+    }
 }
 
 module.exports = UserController;
