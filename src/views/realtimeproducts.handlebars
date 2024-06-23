@@ -1,0 +1,72 @@
+<h1>Bienvenid@ {{first_name}} {{last_name}} </h1>
+<h4>Rol: {{role}}</h4>
+
+<form action="/api/users/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
+<form action="/api/users/profile" method="get">
+  <button type="submit">Profile</button>
+</form>
+
+<br>
+<h2>{{title}}</h2>
+<div>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>En Stock</th>
+        <th>Precio</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      {{#each products}}
+        <tr>
+          <td>{{this.code}}</td>
+          <td>{{this.title}}</td>
+          <td>{{this.description}}</td>
+          <td>{{this.stock}}</td>
+          <td>{{this.price}}</td>          
+          <td>                       
+            <button class="btnDeleteProduct" onclick="deleteProduct('{{this._id}}')">Eliminar</button>
+          </form>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{#if hasPrevPage}}
+    <a href="/realtimeproducts?page={{prevPage}}&limit={{limit}}"> Anterior </a>
+  {{/if}}
+  {{#if hasNextPage}}
+    <a href="/realtimeproducts?page={{nextPage}}&limit={{limit}}"> Siguiente </a>
+  {{/if}}
+  <p>Pagina {{page}} de {{totalPages}} </p>
+
+</div>
+
+
+
+<h2>Agregar Nuevo Producto</h2>
+<form>
+    <input type="text" id="title" placeholder="Titulo">
+    <input type="text" id="description" placeholder="Descripción">
+    <input type="number" id="price" placeholder="Precio">
+    <input type="text" id="img" value="Sin Imagen">
+    <input type="text" id="code" placeholder="Código">
+    <input type="number" id="stock" placeholder="Stock">
+    <input type="text" id="category" placeholder="Categoria">
+     <select id="status">
+        <option value="true">Activo</option>
+        <option value="false">Inactivo</option>
+    </select>
+    <button class="btnAddProduct" onclick="addProduct('{{owner}}')" >Agregar Producto</button>
+    
+</form>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<script src="js/realtime.js"></script>
