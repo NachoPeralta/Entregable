@@ -239,8 +239,10 @@ class ViewsController {
                 currentPage: page,
                 hasPrevPage,
                 hasNextPage,
+                limit: limit,
+                role: role,
                 docs: usersDto,
-                role:  req.user ? req.user.role : null,
+                role:  role,
             });
 
         } catch (error) {
