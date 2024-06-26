@@ -224,15 +224,14 @@ class ViewsController {
             ];
 
             const users = await UserModel.aggregate(criteria);
-            const usersDto = users.map(user => new UserDTO(user.first_name, user.last_name, user.email, user.role, user.last_connection));
-
+            
             // Calcula las propiedades de paginación
             const totalPages = Math.ceil(totalUsers / limit);
             const hasNextPage = page < totalPages;
             const hasPrevPage = page > 1;
 
             res.render("users", {
-                users: usersDto,
+                users: users,
                 totalPages,
                 prevPage: hasPrevPage ? page - 1 : null,
                 nextPage: hasNextPage ? page + 1 : null,
@@ -241,7 +240,7 @@ class ViewsController {
                 hasNextPage,
                 limit: limit,
                 role: role,
-                docs: usersDto,
+                docs: users,
                 role:  role,
             });
 
